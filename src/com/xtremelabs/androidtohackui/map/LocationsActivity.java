@@ -1,7 +1,9 @@
-package com.xtremelabs.androidtohackui;
+package com.xtremelabs.androidtohackui.map;
+
+import android.os.Bundle;
 
 import com.google.android.maps.MapActivity;
-import android.os.Bundle;
+import com.xtremelabs.androidtohackui.R;
 
 public class LocationsActivity extends MapActivity {
 
@@ -9,7 +11,7 @@ public class LocationsActivity extends MapActivity {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
     
-        setContentView(R.id.mapview);
+        setContentView(R.layout.map);
     }
 
     @Override
