@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/bubble"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content">
+    
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+        
+        <ImageView
+            android:id="@+id/top_left_corner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/bubble_left_corner" />
+            
+        <ImageView
+            android:id="@+id/top_stretcher_left"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bubble_top" />
+            
+        <ImageView
+            android:id="@+id/arrow"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/bubble_arrow" />
+            
+        <ImageView
+            android:id="@+id/top_stretcher_right"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bubble_top" />
+    
+        <ImageView
+            android:id="@+id/top_right_corner"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:src="@drawable/bubble_right_corner" />
+    
+    </LinearLayout>
+    
+
+    <FrameLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@drawable/bubble_body">
+        
+          <FrameLayout
+		    android:id="@+id/bubble_content"
+		    android:layout_width="match_parent"
+		    android:layout_height="match_parent"
+		    />
+    
+    </FrameLayout>
+</LinearLayout>
