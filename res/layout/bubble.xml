@@ -43,17 +43,34 @@
     </LinearLayout>
     
 
-    <FrameLayout
+        
+    <LinearLayout
         android:orientation="vertical"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="@drawable/bubble_body">
-        
-          <FrameLayout
+        <LinearLayout
+        	android:id="@+id/bubble_action_bar"
+        	android:layout_width="match_parent"
+        	android:layout_height="50dp"
+        	android:background="#75BB1C"
+        	android:gravity="center">
+        	<TextView
+        		android:id="@+id/bubble_action_bar_title"
+        		android:layout_width="wrap_content"
+        		android:layout_height="wrap_content"
+        		android:layout_gravity="center"
+        		android:text="Title"
+        		android:textSize="18sp"
+        		android:textColor="@android:color/black"/>
+        </LinearLayout>
+
+        <FrameLayout
 		    android:id="@+id/bubble_content"
 		    android:layout_width="match_parent"
-		    android:layout_height="match_parent"
+		    android:layout_height="0dp"
+		    android:layout_weight="1"
 		    />
     
-    </FrameLayout>
+    </LinearLayout>
 </LinearLayout>
