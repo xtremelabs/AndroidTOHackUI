@@ -14,7 +14,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".map.LocationsActivity"></activity>
+        <activity android:name=".map.LocationsActivity" android:hardwareAccelerated="true"></activity>
         <activity 
         	android:name=".bubbles.BubbleExampleActivity"
         	android:configChanges="orientation"
