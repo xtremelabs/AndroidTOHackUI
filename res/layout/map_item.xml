@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="vertical"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:background="@drawable/map_item_bg">
+
+    <LinearLayout
+        android:id="@+id/main_container"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="15dp">
+        
+        <TextView
+            android:id="@+id/title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Title"
+            android:textSize="30sp"
+            android:maxWidth="300dp"
+            android:textColor="@android:color/primary_text_light"
+            android:singleLine="true"
+            android:ellipsize="end"
+            android:textStyle="bold" />
+            
+        <TextView
+            android:id="@+id/description"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas nec aliquam tellus. Aenean feugiat accumsan velit. Vivamus dignissim tortor vitae ligula posuere tempor. Nulla in mauris tortor. Nam lacinia porttitor eleifend. Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas."
+            android:textSize="18sp"
+            android:textColor="@android:color/secondary_text_light"
+            android:maxWidth="300dp"
+            android:maxLines="8"
+            android:ellipsize="end"
+            android:paddingTop="5dp"
+            android:textStyle="bold" />
+
+    </LinearLayout>
+    
+</FrameLayout>
