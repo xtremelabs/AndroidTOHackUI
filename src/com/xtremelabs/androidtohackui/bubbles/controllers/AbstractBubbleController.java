@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
+import android.app.FragmentManager.BackStackEntry;
 import android.app.FragmentTransaction;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
@@ -18,24 +19,25 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 
+import com.xtremelabs.androidtohackui.R;
 import com.xtremelabs.androidtohackui.bubbles.ui.AnchorInfo;
 import com.xtremelabs.androidtohackui.bubbles.ui.BubbleLayout;
 
 abstract public class AbstractBubbleController {
     public static final int BUBBLE_DEFAULT_WIDTH = 380; //standard for Xoom
     public static final int BUBBLE_DEFAULT_HEIGHT = 600; //standard for Xoom
-    private long mLastBubbleAppearance = Long.MIN_VALUE;
+    private long mLastBubbleAppearance = Long.MIN_VALUE; //sentinel value
     public static final String TRANS_ID = "8305612947";
 
     private BubbleLayout mBubbleLayout;
     protected Activity mActivity;
 
-    private ArrayList<Fragment> mStack;
+//    private ArrayList<Fragment> mStack;
     private Button mBackButton;
     private boolean mOpen = false;
     private ArrayList<OnCloseListener> mOnCloseListeners;
 	
-	abstract public void onBubbleAttachedToWindow(ViewGroup container, FragmentManager fragmentManager, Activity activity);
+	abstract public void onBubbleAttachedToWindow();
 	
 	public AbstractBubbleController(final Activity activity)
 	{
@@ -44,7 +46,7 @@ abstract public class AbstractBubbleController {
 			throw new RuntimeException("Can only create bubbles in activities that implement IBubbleContainer");
 		}
 		mActivity = activity;
-	    mStack = new ArrayList<Fragment>();
+//	    mStack = new ArrayList<Fragment>();
 
 	    mBackButton = new Button(activity);
 	    mBackButton.setText("Back");
@@ -104,7 +106,7 @@ abstract public class AbstractBubbleController {
             @Override
             protected void onAttachedToWindow() {
                 super.onAttachedToWindow();
-                onBubbleAttachedToWindow(getContainer(), mActivity.getFragmentManager(), mActivity);
+                onBubbleAttachedToWindow();
             }
         };
 
@@ -178,21 +180,6 @@ abstract public class AbstractBubbleController {
     }
 
 
-//    /**
-//     * Creates a publisher button for
-//     * 
-//     * @param context
-//     * @return
-//     */
-//    public static Button createButton(Context context) {
-//        String layoutService = Context.LAYOUT_INFLATER_SERVICE;
-//        LayoutInflater inflater = (LayoutInflater) context.getSystemService(layoutService);
-//        View view = inflater.inflate(R.layout.back_button, null);
-//        view.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, Units.getDIPValue(32)));
-//        return (Button) view;
-//    }
-
-
     /**
      * Hides the keyboard. Intended to be called whenever a bubble is closed.
      */
@@ -214,13 +201,34 @@ abstract public class AbstractBubbleController {
     }
 
 
+    protected void pushFragment(Fragment fragment, String title) {
+
+      int bodyId = mBubbleLayout.getContainer().getId();
+      FragmentManager fragmentManager = mActivity.getFragmentManager();
+      if (fragmentManager.findFragmentById(bodyId) == null) fragmentManager.beginTransaction()
+              .add(bodyId, fragment)
+              .setBreadCrumbShortTitle(title)
+              .addToBackStack(TRANS_ID).commit();
+      else {
+          FragmentTransaction ft = fragmentManager.beginTransaction();
+          ft.replace(bodyId, fragment)
+          .addToBackStack(TRANS_ID)
+          .setBreadCrumbShortTitle(title).commit();
+      }
+
+      fragmentManager.executePendingTransactions();
+      configureTitleBar();
+  }
+    
+    
     protected void pushFragment(Fragment fragment) {
-        mStack.add(fragment);
+//        mStack.add(fragment);
 
         int bodyId = mBubbleLayout.getContainer().getId();
         FragmentManager fragmentManager = mActivity.getFragmentManager();
         if (fragmentManager.findFragmentById(bodyId) == null) fragmentManager.beginTransaction()
-                .add(bodyId, fragment).commit();
+                .add(bodyId, fragment)
+        		.addToBackStack(TRANS_ID).commit();
         else {
             FragmentTransaction ft = fragmentManager.beginTransaction();
             ft.replace(bodyId, fragment);
@@ -228,7 +236,7 @@ abstract public class AbstractBubbleController {
         }
 
         fragmentManager.executePendingTransactions();
-//        titleBarInfoChanged();
+        configureTitleBar();
     }
 
 
@@ -239,45 +247,42 @@ abstract public class AbstractBubbleController {
      * @return
      */
     public boolean onBackPressed(FragmentManager fragmentManager) {
-        if (mStack.size() <= 0) {
-            return true;
+        if (fragmentManager.getBackStackEntryCount() <= 0) {
+        	closeBubble();
         } else {
             popFragment();
-            return true;
         }
+        return true;
     }
 
 
 
     protected boolean popFragment() {
-        if (mStack.size() <= 0) return false;
+    	FragmentManager fragmentManager = mActivity.getFragmentManager();
+        if (fragmentManager.getBackStackEntryCount() <= 0) return false;
 
-        Fragment fragment = mStack.get(mStack.size() - 1);
-
-        mStack.remove(fragment);
-
-        FragmentManager fragmentManager = mActivity.getFragmentManager();
         hideKeyboard();
         fragmentManager.popBackStackImmediate();
 
-        if (mStack.size() <= 0) {
+        if (fragmentManager.getBackStackEntryCount() <= 0) {
             closeBubble();
         } else {
-//            titleBarInfoChanged();
+        	configureTitleBar();
         }
-
         return true;
     }
 
-
-    protected ArrayList<Fragment> getStack() {
-        return mStack;
+    private void configureTitleBar() {
+    	FragmentManager fragmentManager = mActivity.getFragmentManager();
+//    	if (fragmentManager.getBackStackEntryCount() <= 0) return;
+    	BackStackEntry entry = fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount()-1);
+    	if (entry != null && entry.getBreadCrumbShortTitle() != null) {
+    		setTitle(entry.getBreadCrumbShortTitle().toString());
+    	} //else if current fragment is a IBubbleFragment
     }
 
-
     public TextView getTitleView() {
-    	return null;
-//        return mBubbleLayout.getActionBar().getTitle();
+        return (TextView)mActivity.findViewById(R.id.bubble_action_bar_title);
     }
 
 
@@ -291,36 +296,19 @@ abstract public class AbstractBubbleController {
     }
 
 
-//    public ViewGroup getLeft() {
-//        return mBubbleLayout.getActionBar().getLeftContainer();
-//    }
-//
-//
-//    public ViewGroup getRight() {
-//        return mBubbleLayout.getActionBar().getRightContainer();
-//    }
-//
-//
-//    public void hideActionBar() {
-//        mBubbleLayout.findViewById(R.id.pane_action_bar).setVisibility(View.GONE);
-//    }
-//
-//
-//    public void showActionBar() {
-//        mBubbleLayout.findViewById(R.id.pane_action_bar).setVisibility(View.VISIBLE);
-//    }
+    public void hideActionBar() {
+        mBubbleLayout.findViewById(R.id.bubble_action_bar).setVisibility(View.GONE);
+    }
+
+
+    public void showActionBar() {
+        mBubbleLayout.findViewById(R.id.bubble_action_bar).setVisibility(View.VISIBLE);
+    }
 
 
     public static interface OnCloseListener {
-        /**
-         * Called when bubble is about to the closed, before the visible fragment is removed, and
-         * the bubble view removed from its parent
-         * 
-         * @param bubbleLayout
-         *            the {@link BubbleLayout} for the bubble about to be closed
-         * @param fragmentManager
-         *            the fragment manager for activity containing the bubble
-         */
+    	
+    	//used to inform and activity that the bubble is closing, and that it should remove references to it/clean up
         public void onClose(AbstractBubbleController bubbleController, BubbleLayout bubbleLayout,
                 FragmentManager fragmentManager);
     }

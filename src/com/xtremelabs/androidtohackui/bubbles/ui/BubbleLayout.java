@@ -177,6 +177,10 @@ public class BubbleLayout extends ViewGroup {
         mBubble.setTranslationY(top);
     }
     
+    public BubbleActionBar getActionBar() {
+        return (BubbleActionBar) findViewById(R.id.bubble_action_bar);
+    }
+    
     public ViewGroup getContainer() {
         return (ViewGroup) mBubble.findViewById(mContainerId);
     }
