@@ -36,7 +36,6 @@ public class LocationsActivity extends MapActivity {
         map.getController().setZoom(ZOOM_LEVEL);
         map.getController().setCenter(CONFERENCE_GEOPOINT);
         
-        findViewById(R.id.main_container).setOnClickListener(new MapViewClickListener());
     }
 
     private List<MapItem> createMapItems() {
@@ -77,18 +76,13 @@ public class LocationsActivity extends MapActivity {
         OnClickListener mapItemClickListener = new MapItemClickListener();
 
         for (MapItem mapItem : mMapItems) {
-            LayoutParams params = getMapLayoutParams(mapItem.getGeoPoint());
+            LayoutParams params = createMapLayoutParams(mapItem.getGeoPoint());
             getMapView().addView(mapItem, params);
             mapItem.setOnClickListener(mapItemClickListener);
         }
     }
     
-    @Override
-    protected boolean isRouteDisplayed() {
-        return false;
-    }
-
-    LayoutParams getMapLayoutParams(GeoPoint geoPoint) {
+    private LayoutParams createMapLayoutParams(GeoPoint geoPoint) {
         MapView.LayoutParams params = new MapView.LayoutParams(
                 LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT,
                 geoPoint, MapView.LayoutParams.BOTTOM_CENTER);
@@ -97,32 +91,33 @@ public class LocationsActivity extends MapActivity {
         return params;
     }
     
-    private MapView getMapView() {
-        MapView map = (MapView) findViewById(R.id.mapview);
-        return map;
-    }
-
     private final class MapItemClickListener implements OnClickListener {
         @Override
         public void onClick(View v) {
-            hideAllDescriptions();
             MapItem mapItem = (MapItem) v;
-            mapItem.bringToFront();
-            mapItem.showDescription();
+            if (mapItem.isDescriptionVisible()) {
+                mapItem.hideDescription();
+            } else {
+                hideAllDescriptions();
+                mapItem.bringToFront();
+                mapItem.showDescription();
+            }
         }
     }
     
-    private final class MapViewClickListener implements OnClickListener {
-        @Override
-        public void onClick(View v) {
-            hideAllDescriptions();
-        }
-    }
-
     public void hideAllDescriptions() {
         for (MapItem mapItem : mMapItems) {
             mapItem.hideDescription();
         }
     }
     
+    private MapView getMapView() {
+        MapView map = (MapView) findViewById(R.id.mapview);
+        return map;
+    }
+
+    @Override
+    protected boolean isRouteDisplayed() {
+        return false;
+    }
 }
