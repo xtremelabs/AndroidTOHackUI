@@ -61,22 +61,11 @@ abstract public class AbstractBubbleController {
 	    mOnCloseListeners = new ArrayList<OnCloseListener>();
 	}
 	
-	public void showBubble(AnchorInfo anchorInfo) {
-        showBubble(anchorInfo, 
-                MeasureSpec.makeMeasureSpec(getDIPValue(BUBBLE_DEFAULT_WIDTH), MeasureSpec.AT_MOST),
+    public void showBubble(View anchor) {
+        showBubble(AnchorInfo.createAnchorInfo(anchor), MeasureSpec.makeMeasureSpec(getDIPValue(BUBBLE_DEFAULT_WIDTH), MeasureSpec.AT_MOST),
                 MeasureSpec.makeMeasureSpec(getDIPValue(BUBBLE_DEFAULT_HEIGHT), MeasureSpec.AT_MOST));
     }
     
-    public void showBubble(View anchor) {
-        showBubble(AnchorInfo.createAnchorInfo(anchor));
-    }
-    
-	public void showBubble(View anchor,
-	        int preferredBubbleWidthMeasureSpec, int preferredBubbleHeightMeasureSpec) {
-	    showBubble(AnchorInfo.createAnchorInfo(anchor),
-	            preferredBubbleWidthMeasureSpec, preferredBubbleHeightMeasureSpec);
-	}
-	
 	public void showBubble(final AnchorInfo anchorInfo,
 	            int preferredBubbleWidthMeasureSpec, int preferredBubbleHeightMeasureSpec) {
 
