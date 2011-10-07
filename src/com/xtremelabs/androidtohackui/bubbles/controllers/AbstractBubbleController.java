@@ -17,9 +17,12 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.xtremelabs.androidtohackui.R;
+import com.xtremelabs.androidtohackui.bubbles.fragments.IBubbleFragment;
+import com.xtremelabs.androidtohackui.bubbles.models.BubbleActionBarElements;
 import com.xtremelabs.androidtohackui.bubbles.ui.AnchorInfo;
 import com.xtremelabs.androidtohackui.bubbles.ui.BubbleLayout;
 
@@ -219,10 +222,12 @@ abstract public class AbstractBubbleController {
     
     
     protected void pushFragment(Fragment fragment) {
-//        mStack.add(fragment);
-
         int bodyId = mBubbleLayout.getContainer().getId();
         FragmentManager fragmentManager = mActivity.getFragmentManager();
+    	if (fragment instanceof IBubbleFragment && fragmentManager.getBackStackEntryCount()>0) {
+    		((IBubbleFragment)fragment).getBubbleActionBarElements().setLeftButton(mBackButton);
+    	}
+        
         if (fragmentManager.findFragmentById(bodyId) == null) fragmentManager.beginTransaction()
                 .add(bodyId, fragment)
         		.addToBackStack(TRANS_ID).commit();
@@ -275,9 +280,22 @@ abstract public class AbstractBubbleController {
     	BackStackEntry entry = fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount()-1);
     	if (entry != null && entry.getBreadCrumbShortTitle() != null) {
     		setTitle(entry.getBreadCrumbShortTitle().toString());
-    	} //else if current fragment is a IBubbleFragment
+    	} else if (getVisibleFragment() instanceof IBubbleFragment) {
+    		BubbleActionBarElements elements = ((IBubbleFragment)getVisibleFragment()).getBubbleActionBarElements();
+    		setTitle(elements.getTitle());
+    		setLeftButton(elements.getLeftButton());
+		}
     }
 
+    public void setLeftButton(Button button) {
+    	LinearLayout leftContainer = (LinearLayout)mBubbleLayout.findViewById(R.id.bubble_action_bar_left_container);
+    	leftContainer.removeAllViews();
+    	if (button != null) {
+    		leftContainer.addView(button);
+    	}
+    }
+    
+    
     public TextView getTitleView() {
         return (TextView)mActivity.findViewById(R.id.bubble_action_bar_title);
     }

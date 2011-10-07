@@ -1,21 +1,23 @@
 package com.xtremelabs.androidtohackui.bubbles.fragments;
 
+import com.xtremelabs.androidtohackui.bubbles.models.BubbleActionBarElements;
+
 import android.app.ListFragment;
 import android.os.Bundle;
 import android.widget.AdapterView.OnItemClickListener;
 
 public class BubbleListFragment extends ListFragment implements IBubbleFragment {
 
-	private String mTitle = "";
 	private OnItemClickListener mListener;
+	BubbleActionBarElements mActionBarElements; 
 	
-	@Override
-	public String getTitle() {
-		return mTitle;
+	public BubbleListFragment() {
+		mActionBarElements = new BubbleActionBarElements();
 	}
 	
+	
 	public void setTitle(String title) {
-		mTitle = title;
+		mActionBarElements.setTitle(title);
 	}
 	
 	public void setClickListener(OnItemClickListener listener){
@@ -38,6 +40,11 @@ public class BubbleListFragment extends ListFragment implements IBubbleFragment 
 		if (mListener != null) {
 			getListView().setOnItemClickListener(mListener);
 		}
+	}
+
+	@Override
+	public BubbleActionBarElements getBubbleActionBarElements() {
+		return mActionBarElements;
 	}
 
 }

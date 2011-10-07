@@ -55,14 +55,27 @@
         	android:layout_height="50dp"
         	android:background="#75BB1C"
         	android:gravity="center">
+        	<LinearLayout
+        		android:id="@+id/bubble_action_bar_left_container"
+        		android:layout_width="0dp"
+        		android:layout_weight="0.25"
+        		android:layout_height="wrap_content">
+        	</LinearLayout>
         	<TextView
         		android:id="@+id/bubble_action_bar_title"
-        		android:layout_width="wrap_content"
+        		android:layout_width="0dp"
+        		android:layout_weight="0.5"
         		android:layout_height="wrap_content"
-        		android:layout_gravity="center"
+        		android:gravity="center"
         		android:text="Title"
         		android:textSize="18sp"
         		android:textColor="@android:color/black"/>
+        	<LinearLayout
+        		android:id="@+id/bubble_action_bar_right_container"
+        		android:layout_width="0dp"
+        		android:layout_weight="0.25"
+        		android:layout_height="wrap_content">
+        	</LinearLayout>
         </LinearLayout>
 
         <FrameLayout
