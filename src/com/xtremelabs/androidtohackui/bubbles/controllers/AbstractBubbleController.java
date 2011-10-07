@@ -27,7 +27,7 @@ abstract public class AbstractBubbleController {
     public static final int BUBBLE_DEFAULT_WIDTH = 380; //standard for Xoom
     public static final int BUBBLE_DEFAULT_HEIGHT = 600; //standard for Xoom
     private long mLastBubbleAppearance = Long.MIN_VALUE; //sentinel value
-    public static final String TRANS_ID = "8305612947";
+    private static final String FRAGMENT_TRANSACTION_NAME = "FRAGMENT_TRANSACTION_NAME";
 
     private BubbleLayout mBubbleLayout;
     protected Activity mActivity;
@@ -208,11 +208,11 @@ abstract public class AbstractBubbleController {
       if (fragmentManager.findFragmentById(bodyId) == null) fragmentManager.beginTransaction()
               .add(bodyId, fragment)
               .setBreadCrumbShortTitle(title)
-              .addToBackStack(TRANS_ID).commit();
+              .addToBackStack(FRAGMENT_TRANSACTION_NAME).commit();
       else {
           FragmentTransaction ft = fragmentManager.beginTransaction();
           ft.replace(bodyId, fragment)
-          .addToBackStack(TRANS_ID)
+          .addToBackStack(FRAGMENT_TRANSACTION_NAME)
           .setBreadCrumbShortTitle(title).commit();
       }
 
@@ -228,17 +228,16 @@ abstract public class AbstractBubbleController {
         FragmentManager fragmentManager = mActivity.getFragmentManager();
         if (fragmentManager.findFragmentById(bodyId) == null) fragmentManager.beginTransaction()
                 .add(bodyId, fragment)
-        		.addToBackStack(TRANS_ID).commit();
+        		.addToBackStack(FRAGMENT_TRANSACTION_NAME).commit();
         else {
             FragmentTransaction ft = fragmentManager.beginTransaction();
             ft.replace(bodyId, fragment);
-            ft.addToBackStack(TRANS_ID).commit();
+            ft.addToBackStack(FRAGMENT_TRANSACTION_NAME).commit();
         }
 
         fragmentManager.executePendingTransactions();
         configureTitleBar();
     }
-
 
     /**
      * Custom callback for when the back button is pressed
