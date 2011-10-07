@@ -10,6 +10,7 @@ import android.widget.Button;
 import com.xtremelabs.androidtohackui.R;
 import com.xtremelabs.androidtohackui.bubbles.controllers.AbstractBubbleController;
 import com.xtremelabs.androidtohackui.bubbles.controllers.AbstractBubbleController.OnCloseListener;
+import com.xtremelabs.androidtohackui.bubbles.controllers.ActionBarBubbleController;
 import com.xtremelabs.androidtohackui.bubbles.controllers.BlandBubbleController;
 import com.xtremelabs.androidtohackui.bubbles.controllers.FragmentBubbleController;
 import com.xtremelabs.androidtohackui.bubbles.controllers.IBubbleContainer;
@@ -50,7 +51,7 @@ public class BubbleExampleActivity extends Activity implements IBubbleContainer{
 		button3.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				new BlandBubbleController(BubbleExampleActivity.this).showBubble(v);
+				new ActionBarBubbleController(BubbleExampleActivity.this).showBubble(v);
 			}
 		});
     }

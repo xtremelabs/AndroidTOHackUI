@@ -17,9 +17,12 @@ import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.xtremelabs.androidtohackui.R;
+import com.xtremelabs.androidtohackui.bubbles.fragments.IBubbleFragment;
+import com.xtremelabs.androidtohackui.bubbles.models.BubbleActionBarElements;
 import com.xtremelabs.androidtohackui.bubbles.ui.AnchorInfo;
 import com.xtremelabs.androidtohackui.bubbles.ui.BubbleLayout;
 
@@ -32,7 +35,6 @@ abstract public class AbstractBubbleController {
     private BubbleLayout mBubbleLayout;
     protected Activity mActivity;
 
-//    private ArrayList<Fragment> mStack;
     private Button mBackButton;
     private boolean mOpen = false;
     private ArrayList<OnCloseListener> mOnCloseListeners;
@@ -46,7 +48,6 @@ abstract public class AbstractBubbleController {
 			throw new RuntimeException("Can only create bubbles in activities that implement IBubbleContainer");
 		}
 		mActivity = activity;
-//	    mStack = new ArrayList<Fragment>();
 
 	    mBackButton = new Button(activity);
 	    mBackButton.setText("Back");
@@ -60,22 +61,11 @@ abstract public class AbstractBubbleController {
 	    mOnCloseListeners = new ArrayList<OnCloseListener>();
 	}
 	
-	public void showBubble(AnchorInfo anchorInfo) {
-        showBubble(anchorInfo, 
-                MeasureSpec.makeMeasureSpec(getDIPValue(BUBBLE_DEFAULT_WIDTH), MeasureSpec.AT_MOST),
+    public void showBubble(View anchor) {
+        showBubble(AnchorInfo.createAnchorInfo(anchor), MeasureSpec.makeMeasureSpec(getDIPValue(BUBBLE_DEFAULT_WIDTH), MeasureSpec.AT_MOST),
                 MeasureSpec.makeMeasureSpec(getDIPValue(BUBBLE_DEFAULT_HEIGHT), MeasureSpec.AT_MOST));
     }
     
-    public void showBubble(View anchor) {
-        showBubble(AnchorInfo.createAnchorInfo(anchor));
-    }
-    
-	public void showBubble(View anchor,
-	        int preferredBubbleWidthMeasureSpec, int preferredBubbleHeightMeasureSpec) {
-	    showBubble(AnchorInfo.createAnchorInfo(anchor),
-	            preferredBubbleWidthMeasureSpec, preferredBubbleHeightMeasureSpec);
-	}
-	
 	public void showBubble(final AnchorInfo anchorInfo,
 	            int preferredBubbleWidthMeasureSpec, int preferredBubbleHeightMeasureSpec) {
 
@@ -137,7 +127,6 @@ abstract public class AbstractBubbleController {
 	    frame.addView(mBubbleLayout, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 	    
 	    mOpen  = true;
-	    //titleBarInfoChanged();
 	}
 	
 	protected int getContainerId()
@@ -222,10 +211,12 @@ abstract public class AbstractBubbleController {
     
     
     protected void pushFragment(Fragment fragment) {
-//        mStack.add(fragment);
-
         int bodyId = mBubbleLayout.getContainer().getId();
         FragmentManager fragmentManager = mActivity.getFragmentManager();
+    	if (fragment instanceof IBubbleFragment && fragmentManager.getBackStackEntryCount()>0) {
+    		((IBubbleFragment)fragment).getBubbleActionBarElements().setLeftButton(mBackButton);
+    	}
+        
         if (fragmentManager.findFragmentById(bodyId) == null) fragmentManager.beginTransaction()
                 .add(bodyId, fragment)
         		.addToBackStack(FRAGMENT_TRANSACTION_NAME).commit();
@@ -277,9 +268,22 @@ abstract public class AbstractBubbleController {
     	BackStackEntry entry = fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount()-1);
     	if (entry != null && entry.getBreadCrumbShortTitle() != null) {
     		setTitle(entry.getBreadCrumbShortTitle().toString());
-    	} //else if current fragment is a IBubbleFragment
+    	} else if (getVisibleFragment() instanceof IBubbleFragment) {
+    		BubbleActionBarElements elements = ((IBubbleFragment)getVisibleFragment()).getBubbleActionBarElements();
+    		setTitle(elements.getTitle());
+    		setLeftButton(elements.getLeftButton());
+		}
     }
 
+    public void setLeftButton(Button button) {
+    	LinearLayout leftContainer = (LinearLayout)mBubbleLayout.findViewById(R.id.bubble_action_bar_left_container);
+    	leftContainer.removeAllViews();
+    	if (button != null) {
+    		leftContainer.addView(button);
+    	}
+    }
+    
+    
     public TextView getTitleView() {
         return (TextView)mActivity.findViewById(R.id.bubble_action_bar_title);
     }
@@ -306,7 +310,6 @@ abstract public class AbstractBubbleController {
 
 
     public static interface OnCloseListener {
-    	
     	//used to inform and activity that the bubble is closing, and that it should remove references to it/clean up
         public void onClose(AbstractBubbleController bubbleController, BubbleLayout bubbleLayout,
                 FragmentManager fragmentManager);

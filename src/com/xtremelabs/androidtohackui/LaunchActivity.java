@@ -1,6 +1,7 @@
 package com.xtremelabs.androidtohackui;
 
 import com.xtremelabs.androidtohackui.bubbles.BubbleExampleActivity;
+import com.xtremelabs.androidtohackui.draggables.DraggableExampleActivity;
 import com.xtremelabs.androidtohackui.map.LocationsActivity;
 
 import android.app.ListActivity;
@@ -15,7 +16,8 @@ import android.widget.ArrayAdapter;
 public class LaunchActivity extends ListActivity {
     private static final String[] mListItems = new String[] {
     	"Pop-up Bubbles",
-    	"Map Overlays"
+    	"Map Overlays",
+    	"Draggable Views"
     };
     
     @Override
@@ -42,10 +44,13 @@ public class LaunchActivity extends ListActivity {
     protected void select(int position) {
         switch (position) {
         case 0:
-        	launchBubbbles();
+        	launchBubbles();
         	break;
         case 1:
             launchLocations();
+            break;
+        case 2:
+        	launchDraggables();
             break;
         }
     }
@@ -55,9 +60,14 @@ public class LaunchActivity extends ListActivity {
         startActivity(intent);
     }
     
-    private void launchBubbbles() {
+    private void launchBubbles() {
     	Intent intent = new Intent(this, BubbleExampleActivity.class);
         startActivity(intent);
+    }
+    
+    private void launchDraggables() {
+    	 Intent intent = new Intent(this, DraggableExampleActivity.class);
+         startActivity(intent);
     }
     
 }
