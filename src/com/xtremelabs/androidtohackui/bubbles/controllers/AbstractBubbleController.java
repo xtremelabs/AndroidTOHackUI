@@ -32,7 +32,6 @@ abstract public class AbstractBubbleController {
     private BubbleLayout mBubbleLayout;
     protected Activity mActivity;
 
-//    private ArrayList<Fragment> mStack;
     private Button mBackButton;
     private boolean mOpen = false;
     private ArrayList<OnCloseListener> mOnCloseListeners;
@@ -46,7 +45,6 @@ abstract public class AbstractBubbleController {
 			throw new RuntimeException("Can only create bubbles in activities that implement IBubbleContainer");
 		}
 		mActivity = activity;
-//	    mStack = new ArrayList<Fragment>();
 
 	    mBackButton = new Button(activity);
 	    mBackButton.setText("Back");
@@ -137,7 +135,6 @@ abstract public class AbstractBubbleController {
 	    frame.addView(mBubbleLayout, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
 	    
 	    mOpen  = true;
-	    //titleBarInfoChanged();
 	}
 	
 	protected int getContainerId()
@@ -307,7 +304,6 @@ abstract public class AbstractBubbleController {
 
 
     public static interface OnCloseListener {
-    	
     	//used to inform and activity that the bubble is closing, and that it should remove references to it/clean up
         public void onClose(AbstractBubbleController bubbleController, BubbleLayout bubbleLayout,
                 FragmentManager fragmentManager);

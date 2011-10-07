@@ -19,6 +19,9 @@
         	android:name=".bubbles.BubbleExampleActivity"
         	android:configChanges="orientation"
         	android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
+         <activity 
+        	android:name=".draggables.DraggableExampleActivity"
+        	android:configChanges="keyboard|keyboardHidden|screenLayout|orientation"/>
 
     </application>
 </manifest>
