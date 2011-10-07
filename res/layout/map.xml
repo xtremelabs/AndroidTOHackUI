@@ -11,6 +11,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:clickable="true"
-        android:apiKey="Your Maps API Key" />
+        android:apiKey="0WGX162hnjldOPaYneTKg9JDMqaGKDBSQO8zunA" />
     
 </LinearLayout>

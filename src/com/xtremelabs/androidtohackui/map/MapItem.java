@@ -47,6 +47,10 @@ public class MapItem extends FrameLayout {
         ((TextView) findViewById(R.id.description)).setVisibility(View.GONE);
     }
     
+    public boolean isDescriptionVisible() {
+        return findViewById(R.id.description).getVisibility() == View.VISIBLE;
+    }
+    
     public GeoPoint getGeoPoint() {
         return mGeoPoint;
     }
