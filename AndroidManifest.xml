@@ -22,14 +22,12 @@
             android:hardwareAccelerated="true"></activity>
         <activity
             android:name=".bubbles.BubbleExampleActivity"
-            android:configChanges="orientation"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen"/>
+            android:configChanges="orientation" android:windowSoftInputMode="adjustResize"/>
         <activity
             android:name=".draggables.DraggableExampleActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|orientation"/>
         <activity android:name=".bubbles.compatible.BubbleExampleActivity"
-            android:configChanges="orientation"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+            android:configChanges="orientation" android:windowSoftInputMode="adjustResize"/>
 
     </application>
 </manifest>

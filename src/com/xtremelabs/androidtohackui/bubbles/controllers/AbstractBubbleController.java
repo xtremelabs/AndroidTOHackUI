@@ -246,8 +246,6 @@ abstract public class AbstractBubbleController {
         return true;
     }
 
-
-
     protected boolean popFragment() {
     	FragmentManager fragmentManager = mActivity.getFragmentManager();
         if (fragmentManager.getBackStackEntryCount() <= 0) return false;

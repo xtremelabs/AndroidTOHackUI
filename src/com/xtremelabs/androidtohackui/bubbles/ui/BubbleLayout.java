@@ -86,9 +86,16 @@ public class BubbleLayout extends ViewGroup {
         
         int bubbleHeightMeasureSpec = heightMeasureSpec;
         int bubbleWidthMeasureSpec = widthMeasureSpec;
+        
         if (mAnchorInfo != null) {
-            int bubbleTop = Math.round(mAnchorInfo.y + mAnchorInfo.height);
-            bubbleHeightMeasureSpec = MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(heightMeasureSpec) - bubbleTop, MeasureSpec.getMode(heightMeasureSpec));
+        	float bubbleTop = 0;
+        	int[] containerLocation = new int[2];
+        	getLocationInWindow(containerLocation);
+        	int containerTop = containerLocation[1];
+        	
+            bubbleTop = mAnchorInfo.y + mAnchorInfo.height - containerTop;
+            
+            bubbleHeightMeasureSpec = MeasureSpec.makeMeasureSpec(MeasureSpec.getSize(heightMeasureSpec) - (int) bubbleTop, MeasureSpec.getMode(heightMeasureSpec));
             if (mPreferredBubbleHeightMeasureSpec != Integer.MIN_VALUE) {
                 int mode = MeasureSpec.getMode(mPreferredBubbleHeightMeasureSpec);
                 
@@ -96,7 +103,7 @@ public class BubbleLayout extends ViewGroup {
                 case MeasureSpec.AT_MOST:
                     int maxBubbleHeight = Math.min(
                             MeasureSpec.getSize(mPreferredBubbleHeightMeasureSpec),
-                            MeasureSpec.getSize(heightMeasureSpec) - bubbleTop);
+                            MeasureSpec.getSize(heightMeasureSpec) - (int) bubbleTop);
                     bubbleHeightMeasureSpec = MeasureSpec.makeMeasureSpec(
                             maxBubbleHeight, MeasureSpec.EXACTLY);
                     break;
@@ -126,13 +133,19 @@ public class BubbleLayout extends ViewGroup {
         
         measureChild(mBubble, bubbleWidthMeasureSpec, bubbleHeightMeasureSpec);
         if (mAnchorInfo != null) {
+        	float bubbleLeft = 0;
+        	int[] containerLocation = new int[2];
+        	getLocationInWindow(containerLocation);
+        	int containerLeft = containerLocation[0];
+        	int containerWidth = getMeasuredWidth();
+        	
             int bubbleWidth = mBubble.getMeasuredWidth();
-            int layoutWidth = getMeasuredWidth();
-            int anchorCenter = Math.round(mAnchorInfo.x + mAnchorInfo.width / 2);
-            int bubbleLeft = anchorCenter - bubbleWidth / 2;
+            bubbleLeft = mAnchorInfo.x + mAnchorInfo.width / 2 - bubbleWidth / 2 - containerLeft;
             
             bubbleLeft = Math.max(bubbleLeft, 0);
-            bubbleLeft = Math.min(bubbleLeft, layoutWidth - bubbleWidth);
+            bubbleLeft = Math.min(bubbleLeft, containerWidth - bubbleWidth);
+            
+            int anchorCenter = Math.round(mAnchorInfo.x + mAnchorInfo.width / 2) - containerLeft;
             
             View topLeftCorner = findViewById(R.id.top_left_corner);
             View leftStretcher = findViewById(R.id.top_stretcher_left);
@@ -140,7 +153,7 @@ public class BubbleLayout extends ViewGroup {
             View rightStretcher = findViewById(R.id.top_stretcher_right);
             View topRightCorner = findViewById(R.id.top_right_corner);
 
-            int desiredLeftStretcherWidth = anchorCenter - bubbleLeft - arrow.getMeasuredWidth() / 2 - topRightCorner.getMeasuredWidth();
+            int desiredLeftStretcherWidth = anchorCenter - (int) bubbleLeft - arrow.getMeasuredWidth() / 2 - topRightCorner.getMeasuredWidth();
             int maxLeftStretcherWidth = MeasureSpec.getSize(bubbleWidthMeasureSpec) - topLeftCorner.getMeasuredWidth() - arrow.getMeasuredWidth() - topRightCorner.getMeasuredWidth();
             int finalLeftStretcherWidth = Math.min(Math.round(desiredLeftStretcherWidth), maxLeftStretcherWidth);
             
@@ -160,21 +173,25 @@ public class BubbleLayout extends ViewGroup {
     
     @Override
     protected void onLayout(boolean changed, int l, int t, int r, int b) {
-        float left = 0, top = 0;
+        float bubbleLeft = 0, bubbleTop = 0;
         if (mAnchorInfo != null) {
+        	int[] containerLocation = new int[2];
+        	getLocationInWindow(containerLocation);
+        	int containerLeft = containerLocation[0];
+        	int containerTop = containerLocation[1];
+        	int containerWidth = getMeasuredWidth();
+        	
             int bubbleWidth = mBubble.getMeasuredWidth();
-            int layoutWidth = getMeasuredWidth();
-            left = mAnchorInfo.x + mAnchorInfo.width / 2 - bubbleWidth / 2;
+            bubbleLeft = mAnchorInfo.x + mAnchorInfo.width / 2 - bubbleWidth / 2 - containerLeft;
             
-            left = Math.max(left, 0);
-            left = Math.min(left, layoutWidth - bubbleWidth);
-            top = mAnchorInfo.y + mAnchorInfo.height;
+            bubbleLeft = Math.max(bubbleLeft, 0);
+            bubbleLeft = Math.min(bubbleLeft, containerWidth - bubbleWidth);
+            bubbleTop = mAnchorInfo.y + mAnchorInfo.height - containerTop;
         }
 
-        Log.i(getClass().getSimpleName(), "bubble left: " + left + ", bubble top: " + top);
-        mBubble.layout(0, 0, mBubble.getMeasuredWidth(), mBubble.getMeasuredHeight());
-        mBubble.setTranslationX(left);
-        mBubble.setTranslationY(top);
+        Log.i(getClass().getSimpleName(), "bubble left: " + bubbleLeft + ", bubble top: " + bubbleTop);
+        
+        mBubble.layout((int) bubbleLeft, (int) bubbleTop, (int) bubbleLeft + mBubble.getMeasuredWidth(), (int) bubbleTop + mBubble.getMeasuredHeight());
     }
     
     public BubbleActionBar getActionBar() {

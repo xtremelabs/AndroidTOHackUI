@@ -21,10 +21,10 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.xtremelabs.androidtohackui.R;
-import com.xtremelabs.androidtohackui.bubbles.compatible.ui.BubbleLayout;
 import com.xtremelabs.androidtohackui.bubbles.fragments.IBubbleFragment;
 import com.xtremelabs.androidtohackui.bubbles.models.BubbleActionBarElements;
 import com.xtremelabs.androidtohackui.bubbles.ui.AnchorInfo;
+import com.xtremelabs.androidtohackui.bubbles.ui.BubbleLayout;
 
 abstract public class AbstractBubbleController {
     public static final int BUBBLE_DEFAULT_WIDTH = 380; //standard for Xoom
