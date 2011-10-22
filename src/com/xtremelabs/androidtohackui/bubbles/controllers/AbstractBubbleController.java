@@ -45,7 +45,7 @@ abstract public class AbstractBubbleController {
 	{
 		if(!(activity instanceof IBubbleContainer))
 		{
-			throw new RuntimeException("Can only create bubbles in activities that implement IBubbleContainer");
+			throw new RuntimeException("Activity must implement IBubbleContainer");
 		}
 		mActivity = activity;
 
@@ -226,6 +226,7 @@ abstract public class AbstractBubbleController {
             ft.addToBackStack(TRANS_ID).commit();
         }
 
+        //Force the fragment transactions to execute to ensure that the fragments are pushed when the method returns.
         fragmentManager.executePendingTransactions();
         configureTitleBar();
     }
