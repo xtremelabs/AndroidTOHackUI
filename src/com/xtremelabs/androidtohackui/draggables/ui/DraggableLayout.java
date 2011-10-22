@@ -1,5 +1,7 @@
 package com.xtremelabs.androidtohackui.draggables.ui;
 
+import java.util.Random;
+
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
@@ -83,7 +85,7 @@ public class DraggableLayout extends ViewGroup {
 			throw new RuntimeException("Cannot add a view to DraggableLayout unless it is a DraggableView");
 		}
 		if (getChildCount() > 0) {
-			DraggableView previousViewWithFocus = (DraggableView) getChildAt(getChildCount()-1);
+			DraggableView previousViewWithFocus = getActiveDraggableView();
 			Log.i("AndroidHack", "setting first view to not be touchable");
 			previousViewWithFocus.setIsTouchable(false);
 		}
@@ -220,7 +222,7 @@ public class DraggableLayout extends ViewGroup {
 	    		break;
 	    	case MotionEvent.ACTION_DOWN:
 	    		Log.i("AndroidHack", "Got down");
-	    		mDraggableView = (DraggableView) getChildAt(getChildCount() - 1);
+	    		mDraggableView = getActiveDraggableView();
 	    		mTouchPriority = TOUCH_PRIORITY_UNKNOWN;
 	    		
 	    		if (mDraggableView != null) {
@@ -243,6 +245,30 @@ public class DraggableLayout extends ViewGroup {
 	    }
 	    super.dispatchTouchEvent(event);
 	    return true;
+	}
+	
+	public DraggableView getActiveDraggableView() {
+		return (DraggableView) getChildAt(getChildCount() - 1);
+	}
+	
+	/**
+	 * 
+	 * @return the id of the new view that was created
+	 */
+	public int addNewViewForFragment() {
+		DraggableView draggableView = new DraggableView(getContext());
+		draggableView.setBackgroundResource(android.R.color.white);
+		int newId = generateId();
+		draggableView.setId(newId);
+		addView(draggableView, new LayoutParams(500, android.view.ViewGroup.LayoutParams.MATCH_PARENT));
+		return newId;
+	}
+	
+	private int generateId() {
+		int num;
+		Random rand = new Random(System.currentTimeMillis());
+        num = rand.nextInt(Integer.MAX_VALUE);
+		return num;
 	}
 	
 	

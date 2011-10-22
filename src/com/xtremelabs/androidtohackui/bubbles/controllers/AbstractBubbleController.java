@@ -9,7 +9,6 @@ import android.app.FragmentManager.BackStackEntry;
 import android.app.FragmentTransaction;
 import android.content.res.Resources;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.util.TypedValue;
 import android.view.View;
 import android.view.View.MeasureSpec;
