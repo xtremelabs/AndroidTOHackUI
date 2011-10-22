@@ -53,40 +53,62 @@ public class DraggableLayout extends ViewGroup {
 	@Override
 	public void addView(View child) {
 		checkChild(child);
+		disableActiveChild();
 		super.addView(child);
 	}
 	
 	@Override
 	public void addView(View child, int index, LayoutParams params) {
 		checkChild(child);
+		disableActiveChild();
 		super.addView(child, index, params);
 	}
 	
 	@Override
 	public void addView(View child, LayoutParams params) {
 		checkChild(child);
+		disableActiveChild();
 		super.addView(child, params);
 	}
 	
 	@Override
 	public void addView(View child, int index) {
 		checkChild(child);
+		disableActiveChild();
 		super.addView(child, index);
 	}
 	
 	@Override
 	public void addView(View child, int width, int height) {
 		checkChild(child);
+		disableActiveChild();
 		super.addView(child, width, height);
+	}
+	
+	@Override
+	public void removeView(View view) {
+		super.removeView(view);
+		enableActiveChild();
 	}
 	
 	private void checkChild(View child) {
 		if (!(child instanceof DraggableView)) {
 			throw new RuntimeException("Cannot add a view to DraggableLayout unless it is a DraggableView");
 		}
+	}
+	
+	private void enableActiveChild() {
 		if (getChildCount() > 0) {
 			DraggableView previousViewWithFocus = getActiveDraggableView();
-			Log.i("AndroidHack", "setting first view to not be touchable");
+			Log.i("AndroidHack", "setting active view to  be touchable");
+			previousViewWithFocus.setIsTouchable(true);
+		}
+	}
+	
+	private void disableActiveChild() {
+		if (getChildCount() > 0) {
+			DraggableView previousViewWithFocus = getActiveDraggableView();
+			Log.i("AndroidHack", "setting active view to not be touchable");
 			previousViewWithFocus.setIsTouchable(false);
 		}
 	}
