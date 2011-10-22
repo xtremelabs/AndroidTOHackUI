@@ -6,4 +6,5 @@ public interface IBubbleFragment {
 
 	BubbleActionBarElements getBubbleActionBarElements();
 	
+	void setFragmentHandler(IBubbleFragmentHandler handler);
 }

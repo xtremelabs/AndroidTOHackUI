@@ -17,7 +17,8 @@ public class LaunchActivity extends ListActivity {
     private static final String[] mListItems = new String[] {
     	"Pop-up Bubbles",
     	"Map Overlays",
-    	"Draggable Views"
+    	"Draggable Views",
+    	"Compatible Pop-up Bubbles"
     };
     
     @Override
@@ -52,10 +53,13 @@ public class LaunchActivity extends ListActivity {
         case 2:
         	launchDraggables();
             break;
+        case 3:
+        	launchCompatibleBubbles();
+        	break;
         }
     }
 
-    private void launchLocations() {
+	private void launchLocations() {
         Intent intent = new Intent(this, LocationsActivity.class);
         startActivity(intent);
     }
@@ -66,8 +70,13 @@ public class LaunchActivity extends ListActivity {
     }
     
     private void launchDraggables() {
-    	 Intent intent = new Intent(this, DraggableExampleActivity.class);
-         startActivity(intent);
+    	Intent intent = new Intent(this, DraggableExampleActivity.class);
+    	startActivity(intent);
     }
     
+    private void launchCompatibleBubbles() {
+    	Intent intent = new Intent(this, com.xtremelabs.androidtohackui.bubbles.compatible.BubbleExampleActivity.class);
+    	startActivity(intent);
+	}
+
 }
