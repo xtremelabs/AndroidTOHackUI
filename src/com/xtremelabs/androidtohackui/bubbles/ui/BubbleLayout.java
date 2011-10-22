@@ -61,24 +61,17 @@ public class BubbleLayout extends ViewGroup {
         // measure width
         int widthMode = MeasureSpec.getMode(widthMeasureSpec);
         int finalWidth = 0;
-        // if UNSPECIFIED, take as much width as the views need
         if (widthMode == MeasureSpec.UNSPECIFIED) {
             finalWidth = displayMetrics.widthPixels;
-        }
-        // else if AT_MOST or EXACTLY, then use all available width
-        else {
+        } else {
             finalWidth = MeasureSpec.getSize(widthMeasureSpec);
         }
         
-        // measure height
         int heightMode = MeasureSpec.getMode(heightMeasureSpec);
         int finalHeight = 0;
-        // if UNSPECIFIED, take as much height as the views need
         if (heightMode == MeasureSpec.UNSPECIFIED) {
             finalHeight = displayMetrics.heightPixels;
-        }
-        // else if AT_MOST or EXACTLY, then use all available height
-        else {
+        } else {
             finalHeight = MeasureSpec.getSize(heightMeasureSpec);
         }
         
@@ -165,10 +158,6 @@ public class BubbleLayout extends ViewGroup {
             rightStretcher.getLayoutParams().width = rightStretcherWidth;
         }
         measureChild(mBubble, bubbleWidthMeasureSpec, bubbleHeightMeasureSpec);
-        
-        Log.i(getClass().getSimpleName(), "finalWidth: " + finalWidth + ", finalHeight: " + finalHeight);
-        Log.i(getClass().getSimpleName(), "bubble width: " + mBubble.getMeasuredWidth() + ", bubble height: " + mBubble.getMeasuredHeight());
-        Log.i(getClass().getSimpleName(), "bubble height spec: " + MeasureSpec.toString(bubbleHeightMeasureSpec));
     }
     
     @Override
@@ -188,14 +177,7 @@ public class BubbleLayout extends ViewGroup {
             bubbleLeft = Math.min(bubbleLeft, containerWidth - bubbleWidth);
             bubbleTop = mAnchorInfo.y + mAnchorInfo.height - containerTop;
         }
-
-        Log.i(getClass().getSimpleName(), "bubble left: " + bubbleLeft + ", bubble top: " + bubbleTop);
-        
         mBubble.layout((int) bubbleLeft, (int) bubbleTop, (int) bubbleLeft + mBubble.getMeasuredWidth(), (int) bubbleTop + mBubble.getMeasuredHeight());
-    }
-    
-    public BubbleActionBar getActionBar() {
-        return (BubbleActionBar) findViewById(R.id.bubble_action_bar);
     }
     
     public ViewGroup getContainer() {
