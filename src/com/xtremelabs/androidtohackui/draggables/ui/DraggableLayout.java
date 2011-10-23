@@ -10,6 +10,11 @@ import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.Animation.AnimationListener;
+import android.view.animation.DecelerateInterpolator;
+import android.view.animation.Transformation;
+import android.view.animation.TranslateAnimation;
 
 public class DraggableLayout extends ViewGroup {
 	
@@ -55,6 +60,7 @@ public class DraggableLayout extends ViewGroup {
 		checkChild(child);
 		disableActiveChild();
 		super.addView(child);
+		animateViewIn();
 	}
 	
 	@Override
@@ -62,6 +68,7 @@ public class DraggableLayout extends ViewGroup {
 		checkChild(child);
 		disableActiveChild();
 		super.addView(child, index, params);
+		animateViewIn();
 	}
 	
 	@Override
@@ -69,6 +76,7 @@ public class DraggableLayout extends ViewGroup {
 		checkChild(child);
 		disableActiveChild();
 		super.addView(child, params);
+		animateViewIn();
 	}
 	
 	@Override
@@ -76,6 +84,7 @@ public class DraggableLayout extends ViewGroup {
 		checkChild(child);
 		disableActiveChild();
 		super.addView(child, index);
+		animateViewIn();
 	}
 	
 	@Override
@@ -83,6 +92,13 @@ public class DraggableLayout extends ViewGroup {
 		checkChild(child);
 		disableActiveChild();
 		super.addView(child, width, height);
+		animateViewIn();
+	}
+	
+	private void animateViewIn() {
+		DraggableView activeView = getActiveDraggableView();
+		activeView.setXOffset(getRight());
+		animateActiveViewToAnchor();
 	}
 	
 	@Override
@@ -117,13 +133,11 @@ public class DraggableLayout extends ViewGroup {
 	protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
 		for (int i=0; i<getChildCount(); i++) {
 			View child = getChildAt(i);
-			
 			int childLeft = child.getLeft();
 			int childTop = child.getTop();
-			int childRight = child.getMeasuredWidth() + left;
-			int childBottom = child.getMeasuredHeight() + top;
+			int childRight = child.getMeasuredWidth() + childLeft;
+			int childBottom = child.getMeasuredHeight() + childTop;
 			child.layout(childLeft, childTop, childRight, childBottom);
-			
 		}
 	}
 	
@@ -140,7 +154,6 @@ public class DraggableLayout extends ViewGroup {
         size -= buffer;
 
         int customWidthSpec = MeasureSpec.makeMeasureSpec(size, mode);
-
         for (int i = 0; i < getChildCount(); i++) {
             View child = getChildAt(i);
 
@@ -149,7 +162,6 @@ public class DraggableLayout extends ViewGroup {
             } else {
                 measureChild(child, customWidthSpec, heightMeasureSpec);
             }
-
             if (firstPass && i > 0) {
                 child.setLeft(getMeasuredWidth() - child.getMeasuredWidth());
             }
@@ -160,11 +172,13 @@ public class DraggableLayout extends ViewGroup {
 	@Override
 	protected void onSizeChanged(int w, int h, int oldw, int oldh) {
 		super.onSizeChanged(w, h, oldw, oldh);
-		//reset the subviews to be at 0 on rotation
 		for (int i=0; i<getChildCount(); i++) {
 			DraggableView child = (DraggableView)getChildAt(i);
-			child.setXOffset(0);
+		    Log.i("AndroidHack", "Setting xoffset on resize: "+child.getAnchorX());
+			child.setXOffset(child.getAnchorX());
+			child.invalidate();
 		}
+		invalidate();
 	}
 	
 	private void startTouchSample(MotionEvent event) {
@@ -260,6 +274,9 @@ public class DraggableLayout extends ViewGroup {
 	    		if (mDraggableView != null) {
 	    			mDraggableView.stopTouchSample(event);
 	    		}
+	    		if (mTouchPriority == TOUCH_PRIORITY_DRAGGING) {
+	    			animateActiveViewToAnchor();
+	    		}
 	    		move(event);
 	    		mDraggableView = null;
 	    		mTouchPriority = TOUCH_PRIORITY_UNKNOWN;
@@ -269,6 +286,43 @@ public class DraggableLayout extends ViewGroup {
 	    return true;
 	}
 	
+	private void animateActiveViewToAnchor() {
+		final DraggableView activeView = getActiveDraggableView();
+		if (activeView.getXOffset() == activeView.getAnchorX()) return; 	
+			
+		final float originalOffset = activeView.getXOffset() - activeView.getAnchorX();
+		TranslateAnimation animation = new TranslateAnimation(0, 0, activeView.getTop(), activeView.getTop()){
+			@Override
+			protected void applyTransformation(float interpolatedTime,
+					Transformation t) {
+				Log.i("AndroidHack", "Animating from: "+originalOffset+" to:"+activeView.getAnchorX());
+				activeView.setXOffset(activeView.getAnchorX() + originalOffset - (interpolatedTime)*originalOffset);
+			}
+		};
+		AnimationListener listener = new AnimationListener() {
+			
+			@Override
+			public void onAnimationStart(Animation animation) {
+			}
+			
+			@Override
+			public void onAnimationRepeat(Animation animation) {
+			}
+			
+			@Override
+			public void onAnimationEnd(Animation animation) {
+				Log.i("AndroidHack", "Done animating");
+				activeView.setAnimation(null);
+			}
+		};
+		animation.setDuration(500);
+		animation.setInterpolator(new DecelerateInterpolator());
+		animation.setAnimationListener(listener);
+		animation.setFillAfter(true);
+		activeView.startAnimation(animation);
+	}
+
+
 	public DraggableView getActiveDraggableView() {
 		return (DraggableView) getChildAt(getChildCount() - 1);
 	}
@@ -282,6 +336,12 @@ public class DraggableLayout extends ViewGroup {
 		draggableView.setBackgroundResource(android.R.color.white);
 		int newId = generateId();
 		draggableView.setId(newId);
+		DraggableView activeView = getActiveDraggableView();
+		if (activeView != null) {
+			draggableView.setAnchorX(activeView.getRight());
+		} else {
+			draggableView.setAnchorX(0);
+		}
 		addView(draggableView, new LayoutParams(500, android.view.ViewGroup.LayoutParams.MATCH_PARENT));
 		return newId;
 	}
@@ -327,10 +387,6 @@ public class DraggableLayout extends ViewGroup {
             	invalidate();
                 return true;
             }
-//            } else if (mLayoutListener != null && isScrolling()) {
-//                areTouchesHandled = false;
-//                mLayoutListener.scrollUnhandled(mScrollStatus, xDiff, yDiff);
-//            }
 
             return false;
         }
