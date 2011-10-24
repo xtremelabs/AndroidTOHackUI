@@ -22,9 +22,7 @@ public class BubbleExampleActivity extends Activity implements IBubbleContainer 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-    
         setContentView(R.layout.bubble_example_layout);
-        
         setupButtons();
     }
 	
@@ -47,6 +45,27 @@ public class BubbleExampleActivity extends Activity implements IBubbleContainer 
 		});
     }
 
+    @Override
+    public void onBackPressed() {
+    	boolean handled = false;
+    	if (mBubbleController != null) {
+    		handled = mBubbleController.onBackPressed(getFragmentManager());
+    	}
+    	
+    	if (!handled) {
+    		super.onBackPressed();
+    	}
+    	
+    }
+    
+    
+    
+    /**
+     * IBubbleContainer Methods
+     * 
+     */
+    
+    
 	@Override
 	public int getBubbleContainerId() {
 		return R.id.bubble_container;
@@ -68,17 +87,5 @@ public class BubbleExampleActivity extends Activity implements IBubbleContainer 
 		});
 	}
 	
-	@Override
-	public void onBackPressed() {
-        boolean handled = false;
-        if (mBubbleController != null) {
-            handled = mBubbleController.onBackPressed(getFragmentManager());
-        }
-
-        if (!handled) {
-            super.onBackPressed();
-        }
-
-	}
 	
 }

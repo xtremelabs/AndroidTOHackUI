@@ -13,6 +13,11 @@ public class ActionBarBubbleController extends AbstractBubbleController implemen
 		super(activity);
 	}
 
+	/**
+	 * Overridden methods to provide custom user flows
+	 * 
+	 */
+	
 	@Override
 	public void onBubbleAttachedToWindow() {
 		BubbleListFragment fragment = new BubbleListFragment();

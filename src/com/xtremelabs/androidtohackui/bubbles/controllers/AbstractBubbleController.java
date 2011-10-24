@@ -129,11 +129,6 @@ abstract public class AbstractBubbleController {
 	    mOpen  = true;
 	}
 	
-	protected int getContainerId()
-	{
-		return ((IBubbleContainer)mActivity).getBubbleContainerId();
-	}
-	
 	public void closeBubble() {
 	    if (mBubbleLayout != null) {
 		    hideKeyboard();
@@ -149,6 +144,48 @@ abstract public class AbstractBubbleController {
 		    mOpen = false;
 	    }
 	}
+	
+    protected void pushFragment(Fragment fragment) {
+        int bodyId = mBubbleLayout.getContainer().getId();
+        FragmentManager fragmentManager = mActivity.getFragmentManager();
+    	if (fragment instanceof IBubbleFragment && fragmentManager.getBackStackEntryCount()>0) {
+    		((IBubbleFragment)fragment).getBubbleActionBarElements().setLeftButton(mBackButton);
+    	}
+        
+        if (fragmentManager.findFragmentById(bodyId) == null){
+        		fragmentManager.beginTransaction()
+                .add(bodyId, fragment)
+        		.addToBackStack(TRANS_ID).commit();
+        } else {
+            FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.replace(bodyId, fragment);
+            ft.addToBackStack(TRANS_ID).commit();
+        }
+
+        //Force the fragment transactions to execute to ensure that the fragments are pushed when the method returns.
+        fragmentManager.executePendingTransactions();
+        configureTitleBar();
+    }
+    
+    protected boolean popFragment() {
+    	FragmentManager fragmentManager = mActivity.getFragmentManager();
+        if (fragmentManager.getBackStackEntryCount() <= 0) return false;
+
+        hideKeyboard();
+        fragmentManager.popBackStackImmediate();
+        if (fragmentManager.getBackStackEntryCount() <= 0) {
+            closeBubble();
+        } else {
+        	configureTitleBar();
+        }
+        return true;
+    }
+
+    protected int getContainerId()
+	{
+		return ((IBubbleContainer)mActivity).getBubbleContainerId();
+	}
+
 	
 	public void addOnCloseListener(OnCloseListener listener) {
 	    if (!mOnCloseListeners.contains(listener)) {
@@ -167,8 +204,8 @@ abstract public class AbstractBubbleController {
 	public boolean isOpen() {
         return mOpen;
     }
-
-
+    
+    
     /**
      * Hides the keyboard. Intended to be called whenever a bubble is closed.
      */
@@ -189,28 +226,6 @@ abstract public class AbstractBubbleController {
         return fragmentManager.findFragmentById(bodyId);
     }
 
-    protected void pushFragment(Fragment fragment) {
-        int bodyId = mBubbleLayout.getContainer().getId();
-        FragmentManager fragmentManager = mActivity.getFragmentManager();
-    	if (fragment instanceof IBubbleFragment && fragmentManager.getBackStackEntryCount()>0) {
-    		((IBubbleFragment)fragment).getBubbleActionBarElements().setLeftButton(mBackButton);
-    	}
-        
-        if (fragmentManager.findFragmentById(bodyId) == null) fragmentManager.beginTransaction()
-                .add(bodyId, fragment)
-        		.addToBackStack(TRANS_ID).commit();
-        else {
-            FragmentTransaction ft = fragmentManager.beginTransaction();
-            ft.replace(bodyId, fragment);
-            ft.addToBackStack(TRANS_ID).commit();
-        }
-
-        //Force the fragment transactions to execute to ensure that the fragments are pushed when the method returns.
-        fragmentManager.executePendingTransactions();
-        configureTitleBar();
-    }
-
-
     /**
      * Custom callback for when the back button is pressed
      * 
@@ -226,19 +241,6 @@ abstract public class AbstractBubbleController {
         return true;
     }
 
-    protected boolean popFragment() {
-    	FragmentManager fragmentManager = mActivity.getFragmentManager();
-        if (fragmentManager.getBackStackEntryCount() <= 0) return false;
-
-        hideKeyboard();
-        fragmentManager.popBackStackImmediate();
-        if (fragmentManager.getBackStackEntryCount() <= 0) {
-            closeBubble();
-        } else {
-        	configureTitleBar();
-        }
-        return true;
-    }
 
     private void configureTitleBar() {
     	FragmentManager fragmentManager = mActivity.getFragmentManager();

@@ -176,9 +176,7 @@ public class DraggableLayout extends ViewGroup {
 			DraggableView child = (DraggableView)getChildAt(i);
 		    Log.i("AndroidHack", "Setting xoffset on resize: "+child.getAnchorX());
 			child.setXOffset(child.getAnchorX());
-			child.invalidate();
 		}
-		invalidate();
 	}
 	
 	private void startTouchSample(MotionEvent event) {
@@ -331,7 +329,7 @@ public class DraggableLayout extends ViewGroup {
 	 * 
 	 * @return the id of the new view that was created
 	 */
-	public int addNewViewForFragment() {
+	public int addNewDraggableView() {
 		DraggableView draggableView = new DraggableView(getContext());
 		draggableView.setBackgroundResource(android.R.color.white);
 		int newId = generateId();

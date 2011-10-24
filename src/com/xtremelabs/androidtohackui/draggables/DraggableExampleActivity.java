@@ -19,19 +19,10 @@ public class DraggableExampleActivity extends Activity implements IDraggableFrag
 		
 		setContentView(R.layout.draggable_example_layout);
 		mLayout = (DraggableLayout) findViewById(R.id.draggable_layout);
-		int newId = mLayout.addNewViewForFragment();
+		int newId = mLayout.addNewDraggableView();
 		SimpleDraggableFragment fragment = new SimpleDraggableFragment();
 		fragment.setFragmentHandler(this);
 		addFragmentToViewById(newId, fragment);
-	}
-	
-	@Override
-	public void handleFragment(Fragment fragment) {
-		if (fragment instanceof IDraggableFragment) {
-			((IDraggableFragment) fragment).setFragmentHandler(this);
-			int newId = mLayout.addNewViewForFragment();
-			addFragmentToViewById(newId, fragment);
-		}
 	}
 	
 	private void addFragmentToViewById(int id, Fragment fragment) {
@@ -39,6 +30,15 @@ public class DraggableExampleActivity extends Activity implements IDraggableFrag
 		.add(id, fragment)
 		.addToBackStack("transaction_id")
 		.commit();
+	}
+	
+	@Override
+	public void handleFragment(Fragment fragment) {
+		if (fragment instanceof IDraggableFragment) {
+			((IDraggableFragment) fragment).setFragmentHandler(this);
+			int newId = mLayout.addNewDraggableView();
+			addFragmentToViewById(newId, fragment);
+		}
 	}
 	
 	@Override
