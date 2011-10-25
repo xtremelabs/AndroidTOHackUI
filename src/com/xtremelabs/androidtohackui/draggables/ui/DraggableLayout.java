@@ -10,6 +10,7 @@ import android.view.GestureDetector.SimpleOnGestureListener;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.Animation.AnimationListener;
 import android.view.animation.DecelerateInterpolator;
@@ -31,7 +32,9 @@ public class DraggableLayout extends ViewGroup {
     private int mTouchPriority;
     private int mScrollState;
     private GestureDetector mGestureDetector;
-    private DraggableView mDraggableView;
+    
+    //Very important variable: keeps a reference to the active DraggableView
+    private DraggableView mActiveDraggableView;
     
 	
 	public DraggableLayout(Context context) {
@@ -118,6 +121,10 @@ public class DraggableLayout extends ViewGroup {
 			DraggableView previousViewWithFocus = getActiveDraggableView();
 			Log.i("AndroidHack", "setting active view to  be touchable");
 			previousViewWithFocus.setIsTouchable(true);
+			AlphaAnimation anim = new AlphaAnimation(0.5f, previousViewWithFocus.getAlpha());
+			anim.setFillAfter(true);
+			anim.setDuration(1000);
+			previousViewWithFocus.startAnimation(anim);
 		}
 	}
 	
@@ -126,6 +133,10 @@ public class DraggableLayout extends ViewGroup {
 			DraggableView previousViewWithFocus = getActiveDraggableView();
 			Log.i("AndroidHack", "setting active view to not be touchable");
 			previousViewWithFocus.setIsTouchable(false);
+			AlphaAnimation anim = new AlphaAnimation(previousViewWithFocus.getAlpha(), 0.5f);
+			anim.setFillAfter(true);
+			anim.setDuration(1000);
+			previousViewWithFocus.startAnimation(anim);
 		}
 	}
 	
@@ -228,23 +239,23 @@ public class DraggableLayout extends ViewGroup {
 	    switch (actionCode) {
 	    	case MotionEvent.ACTION_MOVE:
 	    		Log.i("AndroidHack", "Got move");
-	    		if (mDraggableView == null && mTouchPriority == TOUCH_PRIORITY_UNKNOWN) { 
+	    		if (mActiveDraggableView == null && mTouchPriority == TOUCH_PRIORITY_UNKNOWN) { 
 	    			mTouchPriority = TOUCH_PRIORITY_DRAGGING;
 	    		}
 	    		
 	    		if (mTouchPriority == TOUCH_PRIORITY_UNKNOWN) {
-	    			boolean handled = mDraggableView.move(event);
+	    			boolean handled = mActiveDraggableView.move(event);
 	    			
 	    			if(handled){
 	    				stopTouchSample(event);
 	    				mTouchPriority = TOUCH_PRIORITY_VIEW;
 	    			} else {
-	    				mDraggableView.stopTouchSample(event);
+	    				mActiveDraggableView.stopTouchSample(event);
 	    				mTouchPriority = TOUCH_PRIORITY_DRAGGING;
 	    			}
 	    		} else {
 	    			if (mTouchPriority == TOUCH_PRIORITY_VIEW) {
-	    				mDraggableView.move(event);
+	    				mActiveDraggableView.move(event);
 	    			} else if (mTouchPriority == TOUCH_PRIORITY_DRAGGING) {
 	    				if (move(event)) {
 	                        event = MotionEvent.obtain(event);
@@ -256,11 +267,11 @@ public class DraggableLayout extends ViewGroup {
 	    		break;
 	    	case MotionEvent.ACTION_DOWN:
 	    		Log.i("AndroidHack", "Got down");
-	    		mDraggableView = getActiveDraggableView();
+	    		mActiveDraggableView = getActiveDraggableView();
 	    		mTouchPriority = TOUCH_PRIORITY_UNKNOWN;
 	    		
-	    		if (mDraggableView != null) {
-	    			mDraggableView.startTouchSample(event);
+	    		if (mActiveDraggableView != null) {
+	    			mActiveDraggableView.startTouchSample(event);
 	    		} else {
 	    			mTouchPriority = TOUCH_PRIORITY_DRAGGING;
 	    		}
@@ -269,14 +280,14 @@ public class DraggableLayout extends ViewGroup {
 	    		break;
 	    	default:
 	    		Log.i("AndroidHack", "Got other");
-	    		if (mDraggableView != null) {
-	    			mDraggableView.stopTouchSample(event);
+	    		if (mActiveDraggableView != null) {
+	    			mActiveDraggableView.stopTouchSample(event);
 	    		}
 	    		if (mTouchPriority == TOUCH_PRIORITY_DRAGGING) {
 	    			animateActiveViewToAnchor();
 	    		}
 	    		move(event);
-	    		mDraggableView = null;
+	    		mActiveDraggableView = null;
 	    		mTouchPriority = TOUCH_PRIORITY_UNKNOWN;
 	    		break;
 	    }
@@ -380,8 +391,8 @@ public class DraggableLayout extends ViewGroup {
             mMostRecentRawX = e2.getRawX();
             mMostRecentRawY = e2.getRawY();
 
-            if (mDraggableView != null && (mScrollState == SCROLL_STATE_HORIZONTAL)) {
-            	mDraggableView.setXOffset(mDraggableView.getXOffset() + xDiff);
+            if (mActiveDraggableView != null && (mScrollState == SCROLL_STATE_HORIZONTAL)) {
+            	mActiveDraggableView.setXOffset(mActiveDraggableView.getXOffset() + xDiff);
             	invalidate();
                 return true;
             }
