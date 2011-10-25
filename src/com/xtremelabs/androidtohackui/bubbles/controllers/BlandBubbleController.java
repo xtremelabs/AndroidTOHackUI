@@ -6,7 +6,8 @@ import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.EditText;
+
+import com.xtremelabs.androidtohackui.R;
 
 public class BlandBubbleController extends AbstractBubbleController {
 	
@@ -21,9 +22,7 @@ public class BlandBubbleController extends AbstractBubbleController {
 			public View onCreateView(LayoutInflater inflater,
 					ViewGroup container, Bundle savedInstanceState) {
 				
-				EditText editText = new EditText(container.getContext());
-				return editText;
-				
+		        return inflater.inflate(R.layout.sign_in_form, container, false);
 			}
 		};
 		pushFragment(fragment);
