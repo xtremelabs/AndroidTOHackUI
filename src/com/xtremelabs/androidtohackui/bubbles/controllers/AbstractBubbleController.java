@@ -65,20 +65,18 @@ abstract public class AbstractBubbleController {
 		
 		//Get x/y width/height info
 		AnchorInfo anchorInfo = AnchorInfo.createAnchorInfo(anchor);
-		int preferredBubbleWidthMeasureSpec = MeasureSpec.makeMeasureSpec(getDIPValue(BUBBLE_DEFAULT_WIDTH), MeasureSpec.AT_MOST);
-        int preferredBubbleHeightMeasureSpec = MeasureSpec.makeMeasureSpec(getDIPValue(BUBBLE_DEFAULT_HEIGHT), MeasureSpec.AT_MOST);
-		
-        
+
+		//Sanity Checks
         if (isSmashingAnchor()) return;
 		((IBubbleContainer)mActivity).initBubble(this);
-	    
-	        
 		if (mBubbleLayout != null) {
 			closeBubble();
 		}
 		
 		//Create Layout
 	    BubbleLayout layout = createBubbleLayout(anchorInfo);
+	    
+	    //Configure Layout
         layout.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -86,53 +84,33 @@ abstract public class AbstractBubbleController {
             }
         });
 	    layout.setAnchor(anchorInfo);
+	    determineMeasureSpecs(layout);
 	    
-	    if(preferredBubbleHeightMeasureSpec != 0) {
-        	layout.setPreferredBubbleHeightMeasureSpec(preferredBubbleHeightMeasureSpec);
-	    }
-	    if(preferredBubbleWidthMeasureSpec != 0) {
-	    	layout.setPreferredBubbleWidthMeasureSpec(preferredBubbleWidthMeasureSpec);
-	    }
-	    if(preferredBubbleHeightMeasureSpec == 0 || preferredBubbleWidthMeasureSpec == 0)
-	    {
-	    	layout.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-	    }
-	    
-	    ViewGroup frame = (ViewGroup) mActivity.findViewById(getContainerId());
-    	mBubbleLayout = layout;
-	    frame.addView(mBubbleLayout, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-	    
-	    mOpen  = true;
+	    //Attach Layout
+	    attachLayoutToScreen(layout);
 	}
 	
 	
 	public void closeBubble() {
 	    if (mBubbleLayout != null) {
-		    hideKeyboard();
-		    for (OnCloseListener onCloseListener : mOnCloseListeners) {
-		        onCloseListener.onClose(this, mBubbleLayout, mActivity.getFragmentManager());
-		    }
-    		while (mActivity.getFragmentManager().popBackStackImmediate()) {
-    		}
-		    ViewGroup frame = (ViewGroup) mActivity.findViewById(getContainerId());
-		    if (frame != null) frame.removeView(mBubbleLayout);
-		    mBubbleLayout = null;
-		    mActivity = null;
-		    mOpen = false;
+		    cleanupDependencies();
+		    removeLayoutFromScreen();
+		    resetState();
 	    }
 	}
 	
 	protected void pushFragment(Fragment fragment) {
         int bodyId = mBubbleLayout.getContainer().getId();
+    	addBackButton(fragment);
         FragmentManager fragmentManager = mActivity.getFragmentManager();
-    	if (fragment instanceof IBubbleFragment && fragmentManager.getBackStackEntryCount()>0) {
-    		((IBubbleFragment)fragment).getBubbleActionBarElements().setLeftButton(mBackButton);
-    	}
         
-        if (fragmentManager.findFragmentById(bodyId) == null) fragmentManager.beginTransaction()
-                .add(bodyId, fragment)
-        		.addToBackStack(FRAGMENT_TRANSACTION_NAME).commit();
-        else {
+        //Fragment manager maintains backstack
+        //Fragments are added to fragmentManager with a viewId 
+        if (fragmentManager.findFragmentById(bodyId) == null){
+        	fragmentManager.beginTransaction()
+            .add(bodyId, fragment)
+            .addToBackStack(FRAGMENT_TRANSACTION_NAME).commit();
+        } else {
             FragmentTransaction ft = fragmentManager.beginTransaction();
             ft.replace(bodyId, fragment);
             ft.addToBackStack(FRAGMENT_TRANSACTION_NAME).commit();
@@ -145,7 +123,6 @@ abstract public class AbstractBubbleController {
     protected boolean popFragment() {
     	FragmentManager fragmentManager = mActivity.getFragmentManager();
         if (fragmentManager.getBackStackEntryCount() <= 0) return false;
-
         hideKeyboard();
         fragmentManager.popBackStackImmediate();
         if (fragmentManager.getBackStackEntryCount() <= 0) {
@@ -154,6 +131,58 @@ abstract public class AbstractBubbleController {
         	configureTitleBar();
         }
         return true;
+    }
+    
+    private void addBackButton(Fragment fragment) {
+        FragmentManager fragmentManager = mActivity.getFragmentManager();
+    	if (fragment instanceof IBubbleFragment && fragmentManager.getBackStackEntryCount()>0) {
+    		((IBubbleFragment)fragment).getBubbleActionBarElements().setLeftButton(mBackButton);
+    	}
+        
+    }
+    
+    private void resetState() {
+    	mBubbleLayout = null;
+	    mActivity = null;
+	    mOpen = false;
+    }
+    
+    private void removeLayoutFromScreen() {
+    	ViewGroup frame = (ViewGroup) mActivity.findViewById(getContainerId());
+	    if (frame != null) frame.removeView(mBubbleLayout);
+    }
+    
+    private void cleanupDependencies() {
+    	hideKeyboard();
+	    for (OnCloseListener onCloseListener : mOnCloseListeners) {
+	        onCloseListener.onClose(this, mBubbleLayout, mActivity.getFragmentManager());
+	    }
+		while (mActivity.getFragmentManager().popBackStackImmediate()) {
+		}
+    }
+    
+    private void attachLayoutToScreen(BubbleLayout layout) {
+    	ViewGroup frame = (ViewGroup) mActivity.findViewById(getContainerId());
+     	mBubbleLayout = layout;
+ 	    frame.addView(mBubbleLayout, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+ 	    
+ 	    mOpen  = true;
+    }
+    
+    private void determineMeasureSpecs(BubbleLayout layout){
+    	int preferredBubbleWidthMeasureSpec = MeasureSpec.makeMeasureSpec(getDIPValue(BUBBLE_DEFAULT_WIDTH), MeasureSpec.AT_MOST);
+        int preferredBubbleHeightMeasureSpec = MeasureSpec.makeMeasureSpec(getDIPValue(BUBBLE_DEFAULT_HEIGHT), MeasureSpec.AT_MOST);
+    	
+        if(preferredBubbleHeightMeasureSpec != 0) {
+        	layout.setPreferredBubbleHeightMeasureSpec(preferredBubbleHeightMeasureSpec);
+	    }
+	    if(preferredBubbleWidthMeasureSpec != 0) {
+	    	layout.setPreferredBubbleWidthMeasureSpec(preferredBubbleWidthMeasureSpec);
+	    }
+	    if(preferredBubbleHeightMeasureSpec == 0 || preferredBubbleWidthMeasureSpec == 0)
+	    {
+	    	layout.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+	    }
     }
 
     private boolean isSmashingAnchor() {
