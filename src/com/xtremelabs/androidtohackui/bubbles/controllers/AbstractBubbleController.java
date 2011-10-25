@@ -22,7 +22,7 @@ import android.widget.TextView;
 
 import com.xtremelabs.androidtohackui.R;
 import com.xtremelabs.androidtohackui.bubbles.fragments.IBubbleFragment;
-import com.xtremelabs.androidtohackui.bubbles.models.BubbleActionBarElements;
+import com.xtremelabs.androidtohackui.bubbles.models.BubbleTitleBarElements;
 import com.xtremelabs.androidtohackui.bubbles.ui.AnchorInfo;
 import com.xtremelabs.androidtohackui.bubbles.ui.BubbleLayout;
 
@@ -61,26 +61,112 @@ abstract public class AbstractBubbleController {
 	    mOnCloseListeners = new ArrayList<OnCloseListener>();
 	}
 	
-    public void showBubble(View anchor) {
-        showBubble(AnchorInfo.createAnchorInfo(anchor), MeasureSpec.makeMeasureSpec(getDIPValue(BUBBLE_DEFAULT_WIDTH), MeasureSpec.AT_MOST),
-                MeasureSpec.makeMeasureSpec(getDIPValue(BUBBLE_DEFAULT_HEIGHT), MeasureSpec.AT_MOST));
-    }
-    
-	public void showBubble(final AnchorInfo anchorInfo,
-	            int preferredBubbleWidthMeasureSpec, int preferredBubbleHeightMeasureSpec) {
-
+	public void showBubble(View anchor) {
+		
+		//Get x/y width/height info
+		AnchorInfo anchorInfo = AnchorInfo.createAnchorInfo(anchor);
+		int preferredBubbleWidthMeasureSpec = MeasureSpec.makeMeasureSpec(getDIPValue(BUBBLE_DEFAULT_WIDTH), MeasureSpec.AT_MOST);
+        int preferredBubbleHeightMeasureSpec = MeasureSpec.makeMeasureSpec(getDIPValue(BUBBLE_DEFAULT_HEIGHT), MeasureSpec.AT_MOST);
+		
+        
+        if (isSmashingAnchor()) return;
 		((IBubbleContainer)mActivity).initBubble(this);
-	    long now = System.currentTimeMillis();
-	    if(now - mLastBubbleAppearance < 500 && mLastBubbleAppearance != Long.MIN_VALUE)
-	        return;
 	    
-	    mLastBubbleAppearance = now;
 	        
 		if (mBubbleLayout != null) {
 			closeBubble();
 		}
 		
-	    BubbleLayout layout = new BubbleLayout(mActivity) {
+		//Create Layout
+	    BubbleLayout layout = createBubbleLayout(anchorInfo);
+        layout.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                AbstractBubbleController.this.closeBubble();
+            }
+        });
+	    layout.setAnchor(anchorInfo);
+	    
+	    if(preferredBubbleHeightMeasureSpec != 0) {
+        	layout.setPreferredBubbleHeightMeasureSpec(preferredBubbleHeightMeasureSpec);
+	    }
+	    if(preferredBubbleWidthMeasureSpec != 0) {
+	    	layout.setPreferredBubbleWidthMeasureSpec(preferredBubbleWidthMeasureSpec);
+	    }
+	    if(preferredBubbleHeightMeasureSpec == 0 || preferredBubbleWidthMeasureSpec == 0)
+	    {
+	    	layout.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
+	    }
+	    
+	    ViewGroup frame = (ViewGroup) mActivity.findViewById(getContainerId());
+    	mBubbleLayout = layout;
+	    frame.addView(mBubbleLayout, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
+	    
+	    mOpen  = true;
+	}
+	
+	
+	public void closeBubble() {
+	    if (mBubbleLayout != null) {
+		    hideKeyboard();
+		    for (OnCloseListener onCloseListener : mOnCloseListeners) {
+		        onCloseListener.onClose(this, mBubbleLayout, mActivity.getFragmentManager());
+		    }
+    		while (mActivity.getFragmentManager().popBackStackImmediate()) {
+    		}
+		    ViewGroup frame = (ViewGroup) mActivity.findViewById(getContainerId());
+		    if (frame != null) frame.removeView(mBubbleLayout);
+		    mBubbleLayout = null;
+		    mActivity = null;
+		    mOpen = false;
+	    }
+	}
+	
+	protected void pushFragment(Fragment fragment) {
+        int bodyId = mBubbleLayout.getContainer().getId();
+        FragmentManager fragmentManager = mActivity.getFragmentManager();
+    	if (fragment instanceof IBubbleFragment && fragmentManager.getBackStackEntryCount()>0) {
+    		((IBubbleFragment)fragment).getBubbleActionBarElements().setLeftButton(mBackButton);
+    	}
+        
+        if (fragmentManager.findFragmentById(bodyId) == null) fragmentManager.beginTransaction()
+                .add(bodyId, fragment)
+        		.addToBackStack(FRAGMENT_TRANSACTION_NAME).commit();
+        else {
+            FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.replace(bodyId, fragment);
+            ft.addToBackStack(FRAGMENT_TRANSACTION_NAME).commit();
+        }
+
+        fragmentManager.executePendingTransactions();
+        configureTitleBar();
+    }
+    
+    protected boolean popFragment() {
+    	FragmentManager fragmentManager = mActivity.getFragmentManager();
+        if (fragmentManager.getBackStackEntryCount() <= 0) return false;
+
+        hideKeyboard();
+        fragmentManager.popBackStackImmediate();
+        if (fragmentManager.getBackStackEntryCount() <= 0) {
+            closeBubble();
+        } else {
+        	configureTitleBar();
+        }
+        return true;
+    }
+
+    private boolean isSmashingAnchor() {
+	    long now = System.currentTimeMillis();
+	    boolean isSmashing =(now - mLastBubbleAppearance < 500 && mLastBubbleAppearance != Long.MIN_VALUE);
+	    if (!isSmashing) {
+	    	mLastBubbleAppearance = now;
+	    }
+	    return isSmashing;
+    }
+    
+    private BubbleLayout createBubbleLayout(final AnchorInfo anchorInfo) {
+    	return new BubbleLayout(mActivity) {
 	        @Override
 	        protected void onLayout(boolean changed, int left, int top, int right, int bottom) {
                 AnchorInfo newInfo = anchorInfo;
@@ -99,66 +185,8 @@ abstract public class AbstractBubbleController {
                 onBubbleAttachedToWindow();
             }
         };
-
-        layout.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                AbstractBubbleController.this.closeBubble();
-            }
-        });
-	    
-	    layout.setAnchor(anchorInfo);
-	    
-	    if(preferredBubbleHeightMeasureSpec != 0) {
-        	layout.setPreferredBubbleHeightMeasureSpec(preferredBubbleHeightMeasureSpec);
-	    }
-	    if(preferredBubbleWidthMeasureSpec != 0) {
-	    	layout.setPreferredBubbleWidthMeasureSpec(preferredBubbleWidthMeasureSpec);
-	    }
-	    if(preferredBubbleHeightMeasureSpec == 0 || preferredBubbleWidthMeasureSpec == 0)
-	    {
-	    	layout.setLayoutParams(new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT));
-	    }
-	    
-	    ViewGroup frame = (ViewGroup) mActivity.findViewById(getContainerId());
-	    
-    	mBubbleLayout = layout;
-    	
-	    frame.addView(mBubbleLayout, new LayoutParams(LayoutParams.MATCH_PARENT, LayoutParams.MATCH_PARENT));
-	    
-	    mOpen  = true;
-	}
-	
-	public void closeBubble() {
-	    if (mBubbleLayout != null) {
-		    hideKeyboard();
-		    for (OnCloseListener onCloseListener : mOnCloseListeners) {
-		        onCloseListener.onClose(this, mBubbleLayout, mActivity.getFragmentManager());
-		    }
-    		while (mActivity.getFragmentManager().popBackStackImmediate()) {
-    		}
-		    ViewGroup frame = (ViewGroup) mActivity.findViewById(getContainerId());
-		    if (frame != null) frame.removeView(mBubbleLayout);
-		    mBubbleLayout = null;
-		    mActivity = null;
-		    mOpen = false;
-	    }
-	}
-    
-    protected boolean popFragment() {
-    	FragmentManager fragmentManager = mActivity.getFragmentManager();
-        if (fragmentManager.getBackStackEntryCount() <= 0) return false;
-
-        hideKeyboard();
-        fragmentManager.popBackStackImmediate();
-        if (fragmentManager.getBackStackEntryCount() <= 0) {
-            closeBubble();
-        } else {
-        	configureTitleBar();
-        }
-        return true;
     }
-
+    
     protected int getContainerId()
 	{
 		return ((IBubbleContainer)mActivity).getBubbleContainerId();
@@ -204,46 +232,7 @@ abstract public class AbstractBubbleController {
         return fragmentManager.findFragmentById(bodyId);
     }
 
-
-    protected void pushFragment(Fragment fragment, String title) {
-
-      int bodyId = mBubbleLayout.getContainer().getId();
-      FragmentManager fragmentManager = mActivity.getFragmentManager();
-      if (fragmentManager.findFragmentById(bodyId) == null) fragmentManager.beginTransaction()
-              .add(bodyId, fragment)
-              .setBreadCrumbShortTitle(title)
-              .addToBackStack(FRAGMENT_TRANSACTION_NAME).commit();
-      else {
-          FragmentTransaction ft = fragmentManager.beginTransaction();
-          ft.replace(bodyId, fragment)
-          .addToBackStack(FRAGMENT_TRANSACTION_NAME)
-          .setBreadCrumbShortTitle(title).commit();
-      }
-
-      fragmentManager.executePendingTransactions();
-      configureTitleBar();
-    }
     
-    protected void pushFragment(Fragment fragment) {
-        int bodyId = mBubbleLayout.getContainer().getId();
-        FragmentManager fragmentManager = mActivity.getFragmentManager();
-    	if (fragment instanceof IBubbleFragment && fragmentManager.getBackStackEntryCount()>0) {
-    		((IBubbleFragment)fragment).getBubbleActionBarElements().setLeftButton(mBackButton);
-    	}
-        
-        if (fragmentManager.findFragmentById(bodyId) == null) fragmentManager.beginTransaction()
-                .add(bodyId, fragment)
-        		.addToBackStack(FRAGMENT_TRANSACTION_NAME).commit();
-        else {
-            FragmentTransaction ft = fragmentManager.beginTransaction();
-            ft.replace(bodyId, fragment);
-            ft.addToBackStack(FRAGMENT_TRANSACTION_NAME).commit();
-        }
-
-        fragmentManager.executePendingTransactions();
-        configureTitleBar();
-    }
-
     /**
      * Custom callback for when the back button is pressed
      * 
@@ -267,7 +256,7 @@ abstract public class AbstractBubbleController {
     	if (entry != null && entry.getBreadCrumbShortTitle() != null) {
     		setTitle(entry.getBreadCrumbShortTitle().toString());
     	} else if (getVisibleFragment() instanceof IBubbleFragment) {
-    		BubbleActionBarElements elements = ((IBubbleFragment)getVisibleFragment()).getBubbleActionBarElements();
+    		BubbleTitleBarElements elements = ((IBubbleFragment)getVisibleFragment()).getBubbleActionBarElements();
     		setTitle(elements.getTitle());
     		setLeftButton(elements.getLeftButton());
 		}

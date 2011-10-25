@@ -7,9 +7,9 @@ import com.xtremelabs.androidtohackui.bubbles.fragments.BubbleListFragment;
 import com.xtremelabs.androidtohackui.bubbles.fragments.IBubbleFragment;
 import com.xtremelabs.androidtohackui.bubbles.fragments.IBubbleFragmentHandler;
 
-public class ActionBarBubbleController extends AbstractBubbleController implements IBubbleFragmentHandler {
+public class TitleBarBubbleController extends AbstractBubbleController implements IBubbleFragmentHandler {
 
-	public ActionBarBubbleController(Activity activity) {
+	public TitleBarBubbleController(Activity activity) {
 		super(activity);
 	}
 

@@ -22,7 +22,7 @@ import android.widget.TextView;
 
 import com.xtremelabs.androidtohackui.R;
 import com.xtremelabs.androidtohackui.bubbles.fragments.IBubbleFragment;
-import com.xtremelabs.androidtohackui.bubbles.models.BubbleActionBarElements;
+import com.xtremelabs.androidtohackui.bubbles.models.BubbleTitleBarElements;
 import com.xtremelabs.androidtohackui.bubbles.ui.AnchorInfo;
 import com.xtremelabs.androidtohackui.bubbles.ui.BubbleLayout;
 
@@ -268,7 +268,7 @@ abstract public class AbstractBubbleController {
     	if (entry != null && entry.getBreadCrumbShortTitle() != null) {
     		setTitle(entry.getBreadCrumbShortTitle().toString());
     	} else if (getVisibleFragment() instanceof IBubbleFragment) {
-    		BubbleActionBarElements elements = ((IBubbleFragment)getVisibleFragment()).getBubbleActionBarElements();
+    		BubbleTitleBarElements elements = ((IBubbleFragment)getVisibleFragment()).getBubbleActionBarElements();
     		setTitle(elements.getTitle());
     		setLeftButton(elements.getLeftButton());
 		}

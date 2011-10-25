@@ -8,16 +8,16 @@ import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 
 import com.xtremelabs.androidtohackui.R;
-import com.xtremelabs.androidtohackui.bubbles.models.BubbleActionBarElements;
+import com.xtremelabs.androidtohackui.bubbles.models.BubbleTitleBarElements;
 
 public class BubbleListFragment extends ListFragment implements IBubbleFragment {
 
-	private BubbleActionBarElements mActionBarElements; 
+	private BubbleTitleBarElements mActionBarElements; 
 	private IBubbleFragmentHandler mHandler;
 	private OnItemClickListener mListener;
 	
 	public BubbleListFragment() {
-		mActionBarElements = new BubbleActionBarElements();
+		mActionBarElements = new BubbleTitleBarElements();
 	}
 	
 	@Override
@@ -57,7 +57,7 @@ public class BubbleListFragment extends ListFragment implements IBubbleFragment 
 	}
 
 	@Override
-	public BubbleActionBarElements getBubbleActionBarElements() {
+	public BubbleTitleBarElements getBubbleActionBarElements() {
 		return mActionBarElements;
 	}
 

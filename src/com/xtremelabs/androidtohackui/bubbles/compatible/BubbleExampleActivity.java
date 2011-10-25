@@ -11,7 +11,7 @@ import com.xtremelabs.androidtohackui.bubbles.compatible.controllers.AbstractBub
 import com.xtremelabs.androidtohackui.bubbles.compatible.controllers.AbstractBubbleController.OnCloseListener;
 import com.xtremelabs.androidtohackui.bubbles.compatible.controllers.BlandBubbleController;
 import com.xtremelabs.androidtohackui.bubbles.compatible.controllers.IBubbleContainer;
-import com.xtremelabs.androidtohackui.bubbles.controllers.ActionBarBubbleController;
+import com.xtremelabs.androidtohackui.bubbles.controllers.TitleBarBubbleController;
 import com.xtremelabs.androidtohackui.bubbles.ui.BubbleLayout;
 
 public class BubbleExampleActivity extends FragmentActivity implements IBubbleContainer {
@@ -41,7 +41,7 @@ public class BubbleExampleActivity extends FragmentActivity implements IBubbleCo
 		button2.setOnClickListener(new OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				new ActionBarBubbleController(BubbleExampleActivity.this).showBubble(v);
+				new TitleBarBubbleController(BubbleExampleActivity.this).showBubble(v);
 			}
 		});
 

@@ -2,13 +2,13 @@ package com.xtremelabs.androidtohackui.bubbles.models;
 
 import android.widget.Button;
 
-public class BubbleActionBarElements {
+public class BubbleTitleBarElements {
 
 	Button mLeftButton;
 	String mTitle;
 	Button mRightButton;
 	
-	public BubbleActionBarElements() {
+	public BubbleTitleBarElements() {
 	}
 	
 	public void setTitle(String title) {
