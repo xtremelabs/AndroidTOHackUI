@@ -1,44 +1,36 @@
 package com.xtremelabs.androidtohackui.bubbles.controllers;
 
 import android.app.Activity;
-import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.AdapterView.OnItemClickListener;
+import android.app.Fragment;
 
-import com.xtremelabs.androidtohackui.R;
 import com.xtremelabs.androidtohackui.bubbles.fragments.BubbleListFragment;
+import com.xtremelabs.androidtohackui.bubbles.fragments.IBubbleFragment;
+import com.xtremelabs.androidtohackui.bubbles.fragments.IBubbleFragmentHandler;
 
-public class ActionBarBubbleController extends AbstractBubbleController {
+public class ActionBarBubbleController extends AbstractBubbleController implements IBubbleFragmentHandler {
 
 	public ActionBarBubbleController(Activity activity) {
 		super(activity);
 	}
 
+	/**
+	 * Overridden methods to provide custom user flows
+	 * 
+	 */
+	
 	@Override
 	public void onBubbleAttachedToWindow() {
 		BubbleListFragment fragment = new BubbleListFragment();
-		String[] items = {"Item1", "Item2", "Item3", "Item4", "Item5", "Item6", "Item7", "Item8", "Item9", "Item10", "Item11", "Item12"};
-		ArrayAdapter<String> dumpArrayAdapter = new ArrayAdapter<String>(mActivity, R.layout.simple_list_row, R.id.list_row_text, items);
-		fragment.setListAdapter(dumpArrayAdapter);
-		OnItemClickListener listener = new OnItemClickListener() {
-
-			@Override
-			public void onItemClick(AdapterView<?> parent, View view, int position,
-					long id) {
-				String itemTitle = (String) parent.getItemAtPosition(position);
-				BubbleListFragment fragment = new BubbleListFragment();
-				String[] items = {"Item1", "Item2", "Item3", "Item4", "Item5", "Item6", "Item7", "Item8", "Item9", "Item10", "Item11", "Item12"};
-				ArrayAdapter<String> dumpArrayAdapter = new ArrayAdapter<String>(mActivity, R.layout.simple_list_row, R.id.list_row_text, items);
-				fragment.setListAdapter(dumpArrayAdapter);
-				fragment.setClickListener(this);
-				fragment.getBubbleActionBarElements().setTitle(itemTitle);
-				pushFragment(fragment);
-			}
-		};
-		fragment.setClickListener(listener);
-		fragment.getBubbleActionBarElements().setTitle("ITEMS");
+		fragment.setFragmentHandler(this);
+		fragment.setTitle("EMAILS");
 		pushFragment(fragment);
+	}
 
+	@Override
+	public void handleFragment(Fragment fragment) {
+		if (fragment instanceof IBubbleFragment) {
+			((IBubbleFragment)fragment).setFragmentHandler(this);
+		}
+		pushFragment(fragment);
 	}
 }

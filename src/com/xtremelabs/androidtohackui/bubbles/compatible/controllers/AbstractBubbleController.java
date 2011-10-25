@@ -1,13 +1,13 @@
-package com.xtremelabs.androidtohackui.bubbles.controllers;
+package com.xtremelabs.androidtohackui.bubbles.compatible.controllers;
 
 import java.util.ArrayList;
 
-import android.app.Activity;
-import android.app.Fragment;
-import android.app.FragmentManager;
-import android.app.FragmentManager.BackStackEntry;
-import android.app.FragmentTransaction;
 import android.content.res.Resources;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentManager.BackStackEntry;
+import android.support.v4.app.FragmentTransaction;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
@@ -30,10 +30,10 @@ abstract public class AbstractBubbleController {
     public static final int BUBBLE_DEFAULT_WIDTH = 380; //standard for Xoom
     public static final int BUBBLE_DEFAULT_HEIGHT = 600; //standard for Xoom
     private long mLastBubbleAppearance = Long.MIN_VALUE; //sentinel value
-    private static final String FRAGMENT_TRANSACTION_NAME = "FRAGMENT_TRANSACTION_NAME";
+    public static final String TRANS_ID = "8305612947";
 
     private BubbleLayout mBubbleLayout;
-    protected Activity mActivity;
+    protected FragmentActivity mActivity;
 
     private Button mBackButton;
     private boolean mOpen = false;
@@ -41,11 +41,9 @@ abstract public class AbstractBubbleController {
 	
 	abstract public void onBubbleAttachedToWindow();
 	
-	public AbstractBubbleController(final Activity activity)
-	{
-		if(!(activity instanceof IBubbleContainer))
-		{
-			throw new RuntimeException("Activity must implement IBubbleContainer");
+	public AbstractBubbleController(final FragmentActivity activity) {
+		if (!(activity instanceof IBubbleContainer)) {
+			throw new RuntimeException("Can only create bubbles in activities that implement IBubbleContainer");
 		}
 		mActivity = activity;
 
@@ -54,7 +52,7 @@ abstract public class AbstractBubbleController {
 	    mBackButton.setOnClickListener(new OnClickListener() {
 	        @Override
 	        public void onClick(View v) {
-	            onBackPressed(activity.getFragmentManager());
+	            onBackPressed(activity.getSupportFragmentManager());
 	        }
 	    });
 
@@ -69,7 +67,7 @@ abstract public class AbstractBubbleController {
 	public void showBubble(final AnchorInfo anchorInfo,
 	            int preferredBubbleWidthMeasureSpec, int preferredBubbleHeightMeasureSpec) {
 
-		((IBubbleContainer)mActivity).initBubble(this);
+		((IBubbleContainer) mActivity).initBubble(this);
 	    long now = System.currentTimeMillis();
 	    if(now - mLastBubbleAppearance < 500 && mLastBubbleAppearance != Long.MIN_VALUE)
 	        return;
@@ -129,13 +127,18 @@ abstract public class AbstractBubbleController {
 	    mOpen  = true;
 	}
 	
+	protected int getContainerId()
+	{
+		return ((IBubbleContainer)mActivity).getBubbleContainerId();
+	}
+	
 	public void closeBubble() {
 	    if (mBubbleLayout != null) {
 		    hideKeyboard();
 		    for (OnCloseListener onCloseListener : mOnCloseListeners) {
-		        onCloseListener.onClose(this, mBubbleLayout, mActivity.getFragmentManager());
+		        onCloseListener.onClose(this, mBubbleLayout, mActivity.getSupportFragmentManager());
 		    }
-    		while (mActivity.getFragmentManager().popBackStackImmediate()) {
+    		while (mActivity.getSupportFragmentManager().popBackStackImmediate()) {
     		}
 		    ViewGroup frame = (ViewGroup) mActivity.findViewById(getContainerId());
 		    if (frame != null) frame.removeView(mBubbleLayout);
@@ -144,26 +147,6 @@ abstract public class AbstractBubbleController {
 		    mOpen = false;
 	    }
 	}
-    
-    protected boolean popFragment() {
-    	FragmentManager fragmentManager = mActivity.getFragmentManager();
-        if (fragmentManager.getBackStackEntryCount() <= 0) return false;
-
-        hideKeyboard();
-        fragmentManager.popBackStackImmediate();
-        if (fragmentManager.getBackStackEntryCount() <= 0) {
-            closeBubble();
-        } else {
-        	configureTitleBar();
-        }
-        return true;
-    }
-
-    protected int getContainerId()
-	{
-		return ((IBubbleContainer)mActivity).getBubbleContainerId();
-	}
-
 	
 	public void addOnCloseListener(OnCloseListener listener) {
 	    if (!mOnCloseListeners.contains(listener)) {
@@ -182,14 +165,14 @@ abstract public class AbstractBubbleController {
 	public boolean isOpen() {
         return mOpen;
     }
-    
-    
+
+
     /**
      * Hides the keyboard. Intended to be called whenever a bubble is closed.
      */
     private void hideKeyboard() {
         InputMethodManager imm = (InputMethodManager) mActivity
-                .getSystemService(Activity.INPUT_METHOD_SERVICE);
+                .getSystemService(FragmentActivity.INPUT_METHOD_SERVICE);
         View view = mActivity.getCurrentFocus();
         if (view == null) return;
         imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
@@ -200,7 +183,7 @@ abstract public class AbstractBubbleController {
         if (mActivity == null) return null;
 
         int bodyId = mBubbleLayout.getContainer().getId();
-        FragmentManager fragmentManager = mActivity.getFragmentManager();
+        FragmentManager fragmentManager = mActivity.getSupportFragmentManager();
         return fragmentManager.findFragmentById(bodyId);
     }
 
@@ -208,41 +191,43 @@ abstract public class AbstractBubbleController {
     protected void pushFragment(Fragment fragment, String title) {
 
       int bodyId = mBubbleLayout.getContainer().getId();
-      FragmentManager fragmentManager = mActivity.getFragmentManager();
+      FragmentManager fragmentManager = mActivity.getSupportFragmentManager();
       if (fragmentManager.findFragmentById(bodyId) == null) fragmentManager.beginTransaction()
               .add(bodyId, fragment)
               .setBreadCrumbShortTitle(title)
-              .addToBackStack(FRAGMENT_TRANSACTION_NAME).commit();
+              .addToBackStack(TRANS_ID).commit();
       else {
           FragmentTransaction ft = fragmentManager.beginTransaction();
           ft.replace(bodyId, fragment)
-          .addToBackStack(FRAGMENT_TRANSACTION_NAME)
+          .addToBackStack(TRANS_ID)
           .setBreadCrumbShortTitle(title).commit();
       }
 
       fragmentManager.executePendingTransactions();
       configureTitleBar();
-    }
+  }
+    
     
     protected void pushFragment(Fragment fragment) {
         int bodyId = mBubbleLayout.getContainer().getId();
-        FragmentManager fragmentManager = mActivity.getFragmentManager();
+        FragmentManager fragmentManager = mActivity.getSupportFragmentManager();
     	if (fragment instanceof IBubbleFragment && fragmentManager.getBackStackEntryCount()>0) {
     		((IBubbleFragment)fragment).getBubbleActionBarElements().setLeftButton(mBackButton);
     	}
         
         if (fragmentManager.findFragmentById(bodyId) == null) fragmentManager.beginTransaction()
                 .add(bodyId, fragment)
-        		.addToBackStack(FRAGMENT_TRANSACTION_NAME).commit();
+        		.addToBackStack(TRANS_ID).commit();
         else {
             FragmentTransaction ft = fragmentManager.beginTransaction();
             ft.replace(bodyId, fragment);
-            ft.addToBackStack(FRAGMENT_TRANSACTION_NAME).commit();
+            ft.addToBackStack(TRANS_ID).commit();
         }
 
         fragmentManager.executePendingTransactions();
         configureTitleBar();
     }
+
 
     /**
      * Custom callback for when the back button is pressed
@@ -260,8 +245,24 @@ abstract public class AbstractBubbleController {
     }
 
 
+
+    protected boolean popFragment() {
+    	FragmentManager fragmentManager = mActivity.getSupportFragmentManager();
+        if (fragmentManager.getBackStackEntryCount() <= 0) return false;
+
+        hideKeyboard();
+        fragmentManager.popBackStackImmediate();
+
+        if (fragmentManager.getBackStackEntryCount() <= 0) {
+            closeBubble();
+        } else {
+        	configureTitleBar();
+        }
+        return true;
+    }
+
     private void configureTitleBar() {
-    	FragmentManager fragmentManager = mActivity.getFragmentManager();
+    	FragmentManager fragmentManager = mActivity.getSupportFragmentManager();
 //    	if (fragmentManager.getBackStackEntryCount() <= 0) return;
     	BackStackEntry entry = fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount()-1);
     	if (entry != null && entry.getBreadCrumbShortTitle() != null) {

@@ -1,4 +1,4 @@
-package com.xtremelabs.androidtohackui.bubbles.ui;
+package com.xtremelabs.androidtohackui.bubbles.compatible.ui;
 
 import android.content.Context;
 import android.util.AttributeSet;
@@ -12,10 +12,6 @@ public class BubbleActionBar extends LinearLayout {
 	
 	public BubbleActionBar(Context context, AttributeSet attrs) {
 		super(context, attrs);
-	}
-	
-	public BubbleActionBar(Context context, AttributeSet attrs, int defStyle) {
-		super(context, attrs, defStyle);
 	}
 	
 }

@@ -15,6 +15,8 @@ public class DraggableView extends FrameLayout {
 	private boolean mIsTouchable = true;
 	private boolean mIsScrolling;
 	
+	private float mAnchorX;
+	
 	public DraggableView(Context context) {
 		super(context);
 		init(context);
@@ -42,6 +44,14 @@ public class DraggableView extends FrameLayout {
 	
 	public float getXOffset() {
 		return mXOffset;
+	}
+	
+	public void setAnchorX(float anchorX) {
+		mAnchorX = anchorX;
+	}
+	
+	public float getAnchorX() {
+		return mAnchorX;
 	}
 	
 	public void setIsTouchable(boolean touchable){
