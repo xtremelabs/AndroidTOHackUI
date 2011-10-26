@@ -10,12 +10,13 @@ import android.widget.FrameLayout;
 
 public class DraggableView extends FrameLayout {
 
-	private float mXOffset; 
+    private boolean mIsTouchable = true;
+    private float mXOffset; 
+    private float mAnchorX;
+    
+    
 	private GestureDetector mGestureDetector;
-	private boolean mIsTouchable = true;
 	private boolean mIsScrolling;
-	
-	private float mAnchorX;
 	
 	public DraggableView(Context context) {
 		super(context);

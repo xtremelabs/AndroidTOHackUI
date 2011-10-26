@@ -23,7 +23,7 @@ public class DraggableExampleActivity extends Activity implements IDraggableFrag
 		// Create a fragment
 		SimpleDraggableFragment fragment = new SimpleDraggableFragment();
 		
-		//Setup simple callback (just to demonstrate multiple fragments)
+		//Setup a simple callback (just to demonstrate multiple fragments)
 		fragment.setFragmentHandler(this);
 		
 		addFragmentToViewById(newViewId, fragment);

@@ -101,22 +101,23 @@ abstract public class AbstractBubbleController {
 	}
 	
 	protected void pushFragment(Fragment fragment) {
-        int bodyId = mBubbleLayout.getContainer().getId();
+        int bubbleId = mBubbleLayout.getContainer().getId();
     	addBackButton(fragment);
         FragmentManager fragmentManager = mActivity.getFragmentManager();
         
         //Fragment manager maintains backstack
-        //Fragments are added to fragmentManager with a viewId 
-        if (fragmentManager.findFragmentById(bodyId) == null){
+        //Fragments are added to fragmentManager by passing a view, and a fragment
+        if (fragmentManager.findFragmentById(bubbleId) == null){
         	fragmentManager.beginTransaction()
-            .add(bodyId, fragment)
+            .add(bubbleId, fragment)
             .addToBackStack(FRAGMENT_TRANSACTION_NAME).commit();
         } else {
             FragmentTransaction ft = fragmentManager.beginTransaction();
-            ft.replace(bodyId, fragment);
+            ft.replace(bubbleId, fragment);
             ft.addToBackStack(FRAGMENT_TRANSACTION_NAME).commit();
         }
 
+        //ensure fragment is actually pushed to screen before leaving this method
         fragmentManager.executePendingTransactions();
         configureTitleBar();
     }
