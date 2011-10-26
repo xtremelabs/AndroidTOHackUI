@@ -16,8 +16,9 @@ public class NotificationDetailsFragment extends Fragment implements IBubbleFrag
     private IBubbleFragmentHandler mHandler; 
 
     public NotificationDetailsFragment(String title) {
-        mTitle = title;
         mActionBarElements = new BubbleTitleBarElements();
+        mTitle = title;
+        setTitle(mTitle);
     }
     
     @Override
@@ -26,15 +27,10 @@ public class NotificationDetailsFragment extends Fragment implements IBubbleFrag
         super.onCreateView(inflater, container, savedInstanceState);
         
         View view = inflater.inflate(R.layout.notification_details, container, false);
-        getNotificationTitle(view).setText(mTitle);
         
         return view;
     }
 
-    private TextView getNotificationTitle(View layout) {
-        return (TextView) layout.findViewById(R.id.notification_name);
-    }
-    
     public void setTitle(String title) {
         mActionBarElements.setTitle(title);
     }

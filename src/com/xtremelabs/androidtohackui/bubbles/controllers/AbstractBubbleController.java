@@ -7,6 +7,7 @@ import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
@@ -50,6 +51,7 @@ abstract public class AbstractBubbleController {
 
 	    mBackButton = new Button(activity);
 	    mBackButton.setText("Back");
+	    mBackButton.setTextColor(Color.BLACK);
 	    mBackButton.setOnClickListener(new OnClickListener() {
 	        @Override
 	        public void onClick(View v) {
