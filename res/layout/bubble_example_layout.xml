@@ -9,14 +9,13 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:padding="32dp">
+        android:paddingLeft="64dp">
         
         <Button
             android:id="@+id/button1"
             android:layout_width="150dp"
             android:layout_height="70dp"
             android:text="Button1"
-            android:layout_marginRight="32dp"
             android:textColor="#FFFFFF"
             android:textSize="28dp"
             android:textStyle="bold" />
@@ -28,7 +27,8 @@
             android:text="Button2"
             android:textColor="#FFFFFF"
             android:textSize="28dp"
-            android:textStyle="bold" />
+            android:textStyle="bold"
+            android:layout_marginLeft="64dp" />
         
     </LinearLayout>
 </FrameLayout>
