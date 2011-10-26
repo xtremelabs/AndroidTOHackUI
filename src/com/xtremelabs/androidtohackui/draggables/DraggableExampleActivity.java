@@ -17,22 +17,25 @@ public class DraggableExampleActivity extends Activity implements IDraggableFrag
 		super.onCreate(bundle);
 		setContentView(R.layout.draggable_example_layout);
 		
-		//Add a new DraggableView to the layout
-		int newId = ((DraggableLayout) findViewById(R.id.draggable_layout)).addNewDraggableView();
+		// Add a new DraggableView to the layout
+		int newViewId = getDraggableLayout().addNewDraggableView();
 		
-		//Create a fragment
+		// Create a fragment
 		SimpleDraggableFragment fragment = new SimpleDraggableFragment();
+		
+		//Setup simple callback (just to demonstrate multiple fragments)
 		fragment.setFragmentHandler(this);
 		
-		addFragmentToViewById(newId, fragment);
+		addFragmentToViewById(newViewId, fragment);
 	}
 	
-	private void addFragmentToViewById(int id, Fragment fragment) {
+
+    private void addFragmentToViewById(int viewId, Fragment fragment) {
 		//add the fragment to view with id "id"
 		getFragmentManager().beginTransaction()
-		.add(id, fragment)
-		.addToBackStack("transaction_id")
-		.commit();
+    		.add(viewId, fragment)
+    		.addToBackStack("transaction_id")
+    		.commit();
 	}
 	
 	//Handle's pushing new fragments
@@ -40,7 +43,7 @@ public class DraggableExampleActivity extends Activity implements IDraggableFrag
 	public void handleFragment(Fragment fragment) {
 		if (fragment instanceof IDraggableFragment) {
 			((IDraggableFragment) fragment).setFragmentHandler(this);
-			int newId = ((DraggableLayout) findViewById(R.id.draggable_layout)).addNewDraggableView();
+			int newId = getDraggableLayout().addNewDraggableView();
 			addFragmentToViewById(newId, fragment);
 		}
 	}
@@ -53,11 +56,15 @@ public class DraggableExampleActivity extends Activity implements IDraggableFrag
         	super.onBackPressed();
         } else {
         	getFragmentManager().popBackStackImmediate();
-        	DraggableLayout layout = (DraggableLayout) findViewById(R.id.draggable_layout);
+        	DraggableLayout layout = getDraggableLayout();
         	if (findViewById(layout.getActiveDraggableView().getId()) != null) {
         		layout.removeView(findViewById(layout.getActiveDraggableView().getId()));
         	}
         }
 	}
 	
+	private DraggableLayout getDraggableLayout() {
+	    return (DraggableLayout) findViewById(R.id.draggable_layout);
+	}
+
 }

@@ -279,12 +279,7 @@ abstract public class AbstractBubbleController {
 
 
     private void configureTitleBar() {
-    	FragmentManager fragmentManager = mActivity.getFragmentManager();
-//    	if (fragmentManager.getBackStackEntryCount() <= 0) return;
-    	BackStackEntry entry = fragmentManager.getBackStackEntryAt(fragmentManager.getBackStackEntryCount()-1);
-    	if (entry != null && entry.getBreadCrumbShortTitle() != null) {
-    		setTitle(entry.getBreadCrumbShortTitle().toString());
-    	} else if (getVisibleFragment() instanceof IBubbleFragment) {
+    	if (getVisibleFragment() instanceof IBubbleFragment) {
     		BubbleTitleBarElements elements = ((IBubbleFragment)getVisibleFragment()).getBubbleActionBarElements();
     		setTitle(elements.getTitle());
     		setLeftButton(elements.getLeftButton());
