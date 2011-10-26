@@ -13,6 +13,8 @@ public class SignInBubbleController extends AbstractBubbleController {
 
 	@Override
 	public void onBubbleAttachedToWindow() {
+	    hideActionBar();
+
 		Fragment signInFragment = new SignInFragment();
 		pushFragment(signInFragment);
 	}
