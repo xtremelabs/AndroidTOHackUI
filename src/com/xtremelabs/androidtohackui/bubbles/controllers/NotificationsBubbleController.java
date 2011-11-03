@@ -3,13 +3,13 @@ package com.xtremelabs.androidtohackui.bubbles.controllers;
 import android.app.Activity;
 import android.app.Fragment;
 
-import com.xtremelabs.androidtohackui.bubbles.fragments.BubbleListFragment;
+import com.xtremelabs.androidtohackui.bubbles.fragments.NotificationsFragment;
 import com.xtremelabs.androidtohackui.bubbles.fragments.IBubbleFragment;
 import com.xtremelabs.androidtohackui.bubbles.fragments.IBubbleFragmentHandler;
 
-public class TitleBarBubbleController extends AbstractBubbleController implements IBubbleFragmentHandler {
+public class NotificationsBubbleController extends AbstractBubbleController implements IBubbleFragmentHandler {
 
-	public TitleBarBubbleController(Activity activity) {
+	public NotificationsBubbleController(Activity activity) {
 		super(activity);
 	}
 
@@ -20,9 +20,9 @@ public class TitleBarBubbleController extends AbstractBubbleController implement
 	
 	@Override
 	public void onBubbleAttachedToWindow() {
-		BubbleListFragment fragment = new BubbleListFragment();
+		NotificationsFragment fragment = new NotificationsFragment();
 		fragment.setFragmentHandler(this);
-		fragment.setTitle("EMAILS");
+		fragment.setTitle("Notifications");
 		pushFragment(fragment);
 	}
 

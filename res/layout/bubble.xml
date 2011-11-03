@@ -68,8 +68,10 @@
         		android:layout_height="wrap_content"
         		android:gravity="center"
         		android:text="Title"
-        		android:textSize="18sp"
-        		android:textColor="@android:color/black"/>
+        		android:textSize="28sp"
+        		android:textColor="@android:color/black"
+                android:layout_marginTop="4dp"
+                android:layout_marginBottom="6dp" />
         	<LinearLayout
         		android:id="@+id/bubble_action_bar_right_container"
         		android:layout_width="0dp"

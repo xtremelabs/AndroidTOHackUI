@@ -5,9 +5,9 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.app.Fragment;
 import android.app.FragmentManager;
-import android.app.FragmentManager.BackStackEntry;
 import android.app.FragmentTransaction;
 import android.content.res.Resources;
+import android.graphics.Color;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
 import android.view.View;
@@ -51,6 +51,7 @@ abstract public class AbstractBubbleController {
 
 	    mBackButton = new Button(activity);
 	    mBackButton.setText("Back");
+	    mBackButton.setTextColor(Color.BLACK);
 	    mBackButton.setOnClickListener(new OnClickListener() {
 	        @Override
 	        public void onClick(View v) {
@@ -100,22 +101,23 @@ abstract public class AbstractBubbleController {
 	}
 	
 	protected void pushFragment(Fragment fragment) {
-        int bodyId = mBubbleLayout.getContainer().getId();
+        int bubbleId = mBubbleLayout.getContainer().getId();
     	addBackButton(fragment);
         FragmentManager fragmentManager = mActivity.getFragmentManager();
         
         //Fragment manager maintains backstack
-        //Fragments are added to fragmentManager with a viewId 
-        if (fragmentManager.findFragmentById(bodyId) == null){
+        //Fragments are added to fragmentManager by passing a view, and a fragment
+        if (fragmentManager.findFragmentById(bubbleId) == null){
         	fragmentManager.beginTransaction()
-            .add(bodyId, fragment)
+            .add(bubbleId, fragment)
             .addToBackStack(FRAGMENT_TRANSACTION_NAME).commit();
         } else {
             FragmentTransaction ft = fragmentManager.beginTransaction();
-            ft.replace(bodyId, fragment);
+            ft.replace(bubbleId, fragment);
             ft.addToBackStack(FRAGMENT_TRANSACTION_NAME).commit();
         }
 
+        //ensure fragment is actually pushed to screen before leaving this method
         fragmentManager.executePendingTransactions();
         configureTitleBar();
     }

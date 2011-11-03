@@ -2,12 +2,8 @@ package com.xtremelabs.androidtohackui.bubbles.controllers;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.os.Bundle;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
 
-import com.xtremelabs.androidtohackui.R;
+import com.xtremelabs.androidtohackui.bubbles.fragments.SignInFragment;
 
 public class SignInBubbleController extends AbstractBubbleController {
 	
@@ -17,15 +13,10 @@ public class SignInBubbleController extends AbstractBubbleController {
 
 	@Override
 	public void onBubbleAttachedToWindow() {
-		Fragment fragment = new Fragment() {
-			@Override
-			public View onCreateView(LayoutInflater inflater,
-					ViewGroup container, Bundle savedInstanceState) {
-				
-		        return inflater.inflate(R.layout.sign_in_form, container, false);
-			}
-		};
-		pushFragment(fragment);
+	    hideActionBar();
+
+		Fragment signInFragment = new SignInFragment();
+		pushFragment(signInFragment);
 	}
 
 }

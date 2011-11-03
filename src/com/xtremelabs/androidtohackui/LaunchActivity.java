@@ -30,7 +30,7 @@ public class LaunchActivity extends ListActivity {
 
     private void setupList() {
         ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(
-                this, android.R.layout.simple_list_item_1, mListItems);
+                this, R.layout.launch_item_row, R.id.title, mListItems);
         setListAdapter(listAdapter);
         
         getListView().setOnItemClickListener(new OnItemClickListener() {
