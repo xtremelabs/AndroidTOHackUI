@@ -35,7 +35,7 @@ public class DraggableLayout extends ViewGroup {
     
     //Very important variable: keeps a reference to the active DraggableView
     private DraggableView mActiveDraggableView;
-    
+    private Random mRandomGenrator = new Random(System.currentTimeMillis());
 	
 	public DraggableLayout(Context context) {
 		super(context);
@@ -357,8 +357,7 @@ public class DraggableLayout extends ViewGroup {
 	
 	private int generateId() {
 		int num;
-		Random rand = new Random(System.currentTimeMillis());
-        num = rand.nextInt(Integer.MAX_VALUE);
+        num = mRandomGenrator.nextInt(Integer.MAX_VALUE);
 		return num;
 	}
 	
