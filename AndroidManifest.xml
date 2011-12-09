@@ -24,7 +24,13 @@
             android:name=".bubbles.BubbleExampleActivity"
             android:configChanges="orientation" android:windowSoftInputMode="adjustResize"/>
         <activity
+            android:name=".draggables.DockingActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|orientation"/>
+        <activity
             android:name=".draggables.DraggableExampleActivity"
+            android:configChanges="keyboard|keyboardHidden|screenLayout|orientation"/>
+        <activity
+            android:name=".draggables.VerticalDraggableExampleActivity"
             android:configChanges="keyboard|keyboardHidden|screenLayout|orientation"/>
         <activity android:name=".bubbles.compatible.BubbleExampleActivity"
             android:configChanges="orientation" android:windowSoftInputMode="adjustResize"/>

@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="TEST_ORANGE">#FFFF8844</color>
+    <color name="TEST_PURPLE">#FF8844FF</color>
+    <color name="TEST_YELLOW">#FFFFFF00</color>
+    <color name="TEST_BLUE">#FF0000FF</color>
+    <color name="dock_blue">#446633AA</color>
+    <color name="TEST_RED">#FFFF0000</color>
+    <color name="TEST_GREEN">#FF00FF00</color>
+</resources>

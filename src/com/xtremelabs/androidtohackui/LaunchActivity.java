@@ -1,9 +1,5 @@
 package com.xtremelabs.androidtohackui;
 
-import com.xtremelabs.androidtohackui.bubbles.BubbleExampleActivity;
-import com.xtremelabs.androidtohackui.draggables.DraggableExampleActivity;
-import com.xtremelabs.androidtohackui.map.LocationsActivity;
-
 import android.app.ListActivity;
 import android.content.Intent;
 import android.os.Bundle;
@@ -12,31 +8,34 @@ import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.ArrayAdapter;
 
+import com.xtremelabs.androidtohackui.bubbles.BubbleExampleActivity;
+import com.xtremelabs.androidtohackui.draggables.DockingActivity;
+import com.xtremelabs.androidtohackui.draggables.DraggableExampleActivity;
+import com.xtremelabs.androidtohackui.map.LocationsActivity;
+
 
 public class LaunchActivity extends ListActivity {
     private static final String[] mListItems = new String[] {
     	"Pop-up Bubbles",
     	"Map Overlays",
     	"Draggable Views",
+    	"Dockable Views",
     	"Compatible Pop-up Bubbles"
     };
     
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        
+        super.onCreate(savedInstanceState);        
         setupList();
     }
 
     private void setupList() {
-        ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(
-                this, R.layout.launch_item_row, R.id.title, mListItems);
+        ArrayAdapter<String> listAdapter = new ArrayAdapter<String>(this, R.layout.launch_item_row, R.id.title, mListItems);
         setListAdapter(listAdapter);
         
         getListView().setOnItemClickListener(new OnItemClickListener() {
             @Override
-            public void onItemClick(AdapterView<?> parent, View view,
-                    int position, long id) {
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 select(position);
             }
         });
@@ -54,11 +53,14 @@ public class LaunchActivity extends ListActivity {
         	launchDraggables();
             break;
         case 3:
+        	launchDockables();
+        	break;
+        case 4:
         	launchCompatibleBubbles();
         	break;
         }
     }
-
+    
 	private void launchLocations() {
         Intent intent = new Intent(this, LocationsActivity.class);
         startActivity(intent);
@@ -73,6 +75,11 @@ public class LaunchActivity extends ListActivity {
     	Intent intent = new Intent(this, DraggableExampleActivity.class);
     	startActivity(intent);
     }
+    
+	private void launchDockables() {
+    	Intent intent = new Intent(this, DockingActivity.class);
+    	startActivity(intent);
+	}
     
     private void launchCompatibleBubbles() {
     	Intent intent = new Intent(this, com.xtremelabs.androidtohackui.bubbles.compatible.BubbleExampleActivity.class);
